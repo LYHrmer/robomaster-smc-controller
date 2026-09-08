@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.png binary
+*.pdf binary
+*.svg -diff
+# Preserve the exact pinned upstream bytes used by provenance hash checks.
+sim/open_models/sources/** -text -whitespace
+# Matplotlib emits trailing spaces in SVG path data; keep generated output.
+sim/results/** -whitespace

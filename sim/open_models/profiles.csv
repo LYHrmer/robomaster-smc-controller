@@ -1,0 +1,5 @@
+model,axis,inertia_kg_m2,gravity_sin_nm,gravity_cos_nm,min_rad,max_rad
+rmoss_rmua19,yaw,0.00608000833333,0,0,-0.5,0.5
+rmoss_rmua19,pitch,0.004898175,0,-0.220725,-0.785,0.5652
+dynamicx_standard3,yaw,0.00713692704547,0,0,-0.5,0.5
+dynamicx_standard3,pitch,0.00975136641445,-0.45483175984,-0.361892836604,-0.72,0.457

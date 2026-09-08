@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "repository": "rm-controls/rm_description",
+      "commit": "a4b31828bf964e491d3ba5a731d12c1213562feb",
+      "source_path": "urdf/standard/gimbal.urdf.xacro",
+      "local_path": "sources/rm_description/urdf/standard/gimbal.urdf.xacro",
+      "git_blob_sha": "f00063a8b9c1389a3d09431cd669b778f192823f",
+      "sha256": "5322261993187b0a6e473143038a0f3e6bbaa98bca567c309b2c661d807480e2",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/gimbal.urdf.xacro"
+    },
+    {
+      "repository": "rm-controls/rm_description",
+      "commit": "a4b31828bf964e491d3ba5a731d12c1213562feb",
+      "source_path": "urdf/standard/shooter.urdf.xacro",
+      "local_path": "sources/rm_description/urdf/standard/shooter.urdf.xacro",
+      "git_blob_sha": "113f432f3abdb6183f3df524bfde009a558fb630",
+      "sha256": "ebcb0f20ec2398c8df85426ac007b2ead56895827d26a0420ebe9eb90bdb7dc6",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/shooter.urdf.xacro"
+    },
+    {
+      "repository": "rm-controls/rm_description",
+      "commit": "a4b31828bf964e491d3ba5a731d12c1213562feb",
+      "source_path": "urdf/standard3/standard3.urdf.xacro",
+      "local_path": "sources/rm_description/urdf/standard3/standard3.urdf.xacro",
+      "git_blob_sha": "42b4cf69ab0747e91eda63823cd4f8707c9387ce",
+      "sha256": "65fd76128c8d77068d1f8ee7ef65ef601923eb92db4ee52f3b4dcd46771a9e34",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard3/standard3.urdf.xacro"
+    },
+    {
+      "repository": "rm-controls/rm_description",
+      "commit": "a4b31828bf964e491d3ba5a731d12c1213562feb",
+      "source_path": "urdf/common/camera.urdf.xacro",
+      "local_path": "sources/rm_description/urdf/common/camera.urdf.xacro",
+      "git_blob_sha": "0d6bcc69056609063ae9298ff76b823c9fb0333e",
+      "sha256": "7e98ed7168e94099002bd685f2d43d1d8fa329fd3feeb2775c0bf9aab58c05f9",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/camera.urdf.xacro"
+    },
+    {
+      "repository": "rm-controls/rm_description",
+      "commit": "a4b31828bf964e491d3ba5a731d12c1213562feb",
+      "source_path": "urdf/common/friction.urdf.xacro",
+      "local_path": "sources/rm_description/urdf/common/friction.urdf.xacro",
+      "git_blob_sha": "dc16fd7d5eb34da6b8fe838bf6ec742db9a671b1",
+      "sha256": "8e0676bc303db376da751c5f7098c8d000928dc42752fcd83f7be373c4f7f9b8",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/friction.urdf.xacro"
+    },
+    {
+      "repository": "rm-controls/rm_description",
+      "commit": "a4b31828bf964e491d3ba5a731d12c1213562feb",
+      "source_path": "urdf/common/imu.urdf.xacro",
+      "local_path": "sources/rm_description/urdf/common/imu.urdf.xacro",
+      "git_blob_sha": "ab99f216f7d3194399207946c2709cfcfb302cbb",
+      "sha256": "37275d6b64f1001d09454c67a585bf1b500cbeffca1cf7ac3c29472e69fa1ff2",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/imu.urdf.xacro"
+    },
+    {
+      "repository": "rm-controls/rm_description",
+      "commit": "a4b31828bf964e491d3ba5a731d12c1213562feb",
+      "source_path": "LICENSE",
+      "local_path": "sources/rm_description/LICENSE",
+      "git_blob_sha": "f733c9516cee5c13df0f38cac86f976399490272",
+      "sha256": "4f88acab0afecc99a401f7a5a71a6feb2406a8c73542a447d2773008e4654689",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/LICENSE"
+    },
+    {
+      "repository": "rm-controls/rm_description",
+      "commit": "a4b31828bf964e491d3ba5a731d12c1213562feb",
+      "source_path": "README.md",
+      "local_path": "sources/rm_description/README.md",
+      "git_blob_sha": "5e6069def4966e309bf9c67b7c5bb2c7bd4c3f53",
+      "sha256": "f68e00da4fcea2073ca8cd1e044fd13520fe460a1554e3738ae0fde39c938350",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/README.md"
+    },
+    {
+      "repository": "robomaster-oss/rmoss_gz_resources",
+      "commit": "20530be7afda1c6a15cab90a46706aa58463acba",
+      "source_path": "resource/models/rmua19_standard_robot/model.sdf",
+      "local_path": "sources/rmoss_gz_resources/resource/models/rmua19_standard_robot/model.sdf",
+      "git_blob_sha": "d2a178010777c7f7f2c24b6d455a823bf3233eff",
+      "sha256": "9afa16187079e30c1cd774f6e8fe6b27f3777331bdd8ca9571112abc5077e074",
+      "license": "Apache-2.0",
+      "url": "https://github.com/robomaster-oss/rmoss_gz_resources/blob/20530be7afda1c6a15cab90a46706aa58463acba/resource/models/rmua19_standard_robot/model.sdf"
+    },
+    {
+      "repository": "robomaster-oss/rmoss_gz_resources",
+      "commit": "20530be7afda1c6a15cab90a46706aa58463acba",
+      "source_path": "LICENSE",
+      "local_path": "sources/rmoss_gz_resources/LICENSE",
+      "git_blob_sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "license": "Apache-2.0",
+      "url": "https://github.com/robomaster-oss/rmoss_gz_resources/blob/20530be7afda1c6a15cab90a46706aa58463acba/LICENSE"
+    },
+    {
+      "repository": "robomaster-oss/rmoss_gz_resources",
+      "commit": "20530be7afda1c6a15cab90a46706aa58463acba",
+      "source_path": "README.md",
+      "local_path": "sources/rmoss_gz_resources/README.md",
+      "git_blob_sha": "6a67f3172f5316cb56a24ee0145408e75319f696",
+      "sha256": "181b5dd9efe7d19c32afb97871b3ae50f39368b8c94b83e17a3478c7fefe2808",
+      "license": "Apache-2.0",
+      "url": "https://github.com/robomaster-oss/rmoss_gz_resources/blob/20530be7afda1c6a15cab90a46706aa58463acba/README.md"
+    }
+  ]
+}

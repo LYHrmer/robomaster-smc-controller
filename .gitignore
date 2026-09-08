@@ -1,0 +1,9 @@
+/build*/
+/dist/
+__pycache__/
+*.pyc
+*.o
+*.a
+*.elf
+*.map
+/sim/results/simulation*.csv

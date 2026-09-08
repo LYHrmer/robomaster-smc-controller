@@ -1,0 +1,1299 @@
+{
+  "schema_version": 1,
+  "gravity_world_m_s2": [
+    0.0,
+    0.0,
+    -9.81
+  ],
+  "dynamics_convention": "J*qdd = command_torque - B*qdot - hold_gravity_torque(q) + disturbance",
+  "hold_gravity_torque": "gravity_sin_nm*sin(q) + gravity_cos_nm*cos(q)",
+  "inertia_scope": "Locked-subtree joint inertia at q=0, base fixed; excludes unmodeled rotor reflection and moving-joint coupling.",
+  "classification": {
+    "rmoss_rmua19": "Maintainer-built primitive-shape SDF using official robot drawings; not measured inertia.",
+    "dynamicx_standard3": "Author-published URDF model constants; measurement/CAD provenance not specified in the pinned sources; one explicit virtual-frame tensor correction."
+  },
+  "models": [
+    {
+      "model": "rmoss_rmua19",
+      "corrections": [],
+      "axes": [
+        {
+          "joint": "gimbal_yaw_joint",
+          "joint_source": {
+            "path": "rmoss_gz_resources/resource/models/rmua19_standard_robot/model.sdf",
+            "line": 279,
+            "url": "https://github.com/robomaster-oss/rmoss_gz_resources/blob/20530be7afda1c6a15cab90a46706aa58463acba/resource/models/rmua19_standard_robot/model.sdf#L279"
+          },
+          "world_axis": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "world_joint_origin_m": [
+            0.0,
+            0.0,
+            0.1376
+          ],
+          "source_joint_limits_rad": [
+            -1.57,
+            1.57
+          ],
+          "validation_limits_rad": [
+            -0.5,
+            0.5
+          ],
+          "validation_interval_note": "Yaw uses chosen +/-0.5 rad test interval; not a claim of source limits.",
+          "frozen_pose": "All joint positions and velocities zero; base fixed; descendant actuated joints locked.",
+          "included_subtree_mass_kg": 1.6,
+          "subtree_com_from_axis_world_m": [
+            0.0140625,
+            0.0015,
+            0.0975
+          ],
+          "actual_gravity_drive_sin_nm": -0.0,
+          "actual_gravity_drive_cos_nm": -0.0,
+          "required_hold_torque_sin_nm": 0.0,
+          "required_hold_torque_cos_nm": 0.0,
+          "contributions": [
+            {
+              "link": "gimbal_yaw",
+              "source": {
+                "path": "rmoss_gz_resources/resource/models/rmua19_standard_robot/model.sdf",
+                "line": 291,
+                "url": "https://github.com/robomaster-oss/rmoss_gz_resources/blob/20530be7afda1c6a15cab90a46706aa58463acba/resource/models/rmua19_standard_robot/model.sdf#L291"
+              },
+              "mass_kg": 1.0,
+              "com_from_axis_origin_world_m": [
+                0.0,
+                0.0,
+                0.06
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  0.00303333333333,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.00303333333333,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.00125
+                ]
+              ],
+              "center_projection_kg_m2": 0.00125,
+              "parallel_axis_kg_m2": 0.0,
+              "axis_inertia_kg_m2": 0.00125
+            },
+            {
+              "link": "gimbal_pitch",
+              "source": {
+                "path": "rmoss_gz_resources/resource/models/rmua19_standard_robot/model.sdf",
+                "line": 334,
+                "url": "https://github.com/robomaster-oss/rmoss_gz_resources/blob/20530be7afda1c6a15cab90a46706aa58463acba/resource/models/rmua19_standard_robot/model.sdf#L334"
+              },
+              "mass_kg": 0.5,
+              "com_from_axis_origin_world_m": [
+                0.02,
+                0.004,
+                0.16
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  0.000754166666667,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.00302083333333,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.00294166666667
+                ]
+              ],
+              "center_projection_kg_m2": 0.00294166666667,
+              "parallel_axis_kg_m2": 0.000208,
+              "axis_inertia_kg_m2": 0.00314966666667
+            },
+            {
+              "link": "speed_monitor",
+              "source": {
+                "path": "rmoss_gz_resources/resource/models/rmua19_standard_robot/model.sdf",
+                "line": 964,
+                "url": "https://github.com/robomaster-oss/rmoss_gz_resources/blob/20530be7afda1c6a15cab90a46706aa58463acba/resource/models/rmua19_standard_robot/model.sdf#L964"
+              },
+              "mass_kg": 0.1,
+              "com_from_axis_origin_world_m": [
+                0.125,
+                0.004,
+                0.16
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  2.94166666667e-05,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.000114841666667,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.000116241666667
+                ]
+              ],
+              "center_projection_kg_m2": 0.000116241666667,
+              "parallel_axis_kg_m2": 0.0015641,
+              "axis_inertia_kg_m2": 0.00168034166667
+            }
+          ],
+          "profile": {
+            "model": "rmoss_rmua19",
+            "axis": "yaw",
+            "inertia_kg_m2": 0.00608000833333,
+            "gravity_sin_nm": 0.0,
+            "gravity_cos_nm": 0.0,
+            "min_rad": -0.5,
+            "max_rad": 0.5
+          }
+        },
+        {
+          "joint": "gimbal_pitch_joint",
+          "joint_source": {
+            "path": "rmoss_gz_resources/resource/models/rmua19_standard_robot/model.sdf",
+            "line": 322,
+            "url": "https://github.com/robomaster-oss/rmoss_gz_resources/blob/20530be7afda1c6a15cab90a46706aa58463acba/resource/models/rmua19_standard_robot/model.sdf#L322"
+          },
+          "world_axis": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "world_joint_origin_m": [
+            0.0,
+            0.004,
+            0.2976
+          ],
+          "source_joint_limits_rad": [
+            -0.785,
+            0.5652
+          ],
+          "validation_limits_rad": [
+            -0.785,
+            0.5652
+          ],
+          "validation_interval_note": "Pitch limits copied from source model.",
+          "frozen_pose": "All joint positions and velocities zero; base fixed; descendant actuated joints locked.",
+          "included_subtree_mass_kg": 0.6,
+          "subtree_com_from_axis_world_m": [
+            0.0375,
+            0.0,
+            0.0
+          ],
+          "actual_gravity_drive_sin_nm": -0.0,
+          "actual_gravity_drive_cos_nm": 0.220725,
+          "required_hold_torque_sin_nm": 0.0,
+          "required_hold_torque_cos_nm": -0.220725,
+          "contributions": [
+            {
+              "link": "gimbal_pitch",
+              "source": {
+                "path": "rmoss_gz_resources/resource/models/rmua19_standard_robot/model.sdf",
+                "line": 334,
+                "url": "https://github.com/robomaster-oss/rmoss_gz_resources/blob/20530be7afda1c6a15cab90a46706aa58463acba/resource/models/rmua19_standard_robot/model.sdf#L334"
+              },
+              "mass_kg": 0.5,
+              "com_from_axis_origin_world_m": [
+                0.02,
+                0.0,
+                0.0
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  0.000754166666667,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.00302083333333,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.00294166666667
+                ]
+              ],
+              "center_projection_kg_m2": 0.00302083333333,
+              "parallel_axis_kg_m2": 0.0002,
+              "axis_inertia_kg_m2": 0.00322083333333
+            },
+            {
+              "link": "speed_monitor",
+              "source": {
+                "path": "rmoss_gz_resources/resource/models/rmua19_standard_robot/model.sdf",
+                "line": 964,
+                "url": "https://github.com/robomaster-oss/rmoss_gz_resources/blob/20530be7afda1c6a15cab90a46706aa58463acba/resource/models/rmua19_standard_robot/model.sdf#L964"
+              },
+              "mass_kg": 0.1,
+              "com_from_axis_origin_world_m": [
+                0.125,
+                0.0,
+                0.0
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  2.94166666667e-05,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.000114841666667,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.000116241666667
+                ]
+              ],
+              "center_projection_kg_m2": 0.000114841666667,
+              "parallel_axis_kg_m2": 0.0015625,
+              "axis_inertia_kg_m2": 0.00167734166667
+            }
+          ],
+          "profile": {
+            "model": "rmoss_rmua19",
+            "axis": "pitch",
+            "inertia_kg_m2": 0.004898175,
+            "gravity_sin_nm": 0.0,
+            "gravity_cos_nm": -0.220725,
+            "min_rad": -0.785,
+            "max_rad": 0.5652
+          }
+        }
+      ]
+    },
+    {
+      "model": "dynamicx_standard3",
+      "corrections": [
+        {
+          "link": "camera_optical_frame",
+          "source": {
+            "path": "rm_description/urdf/common/camera.urdf.xacro",
+            "line": 32,
+            "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/camera.urdf.xacro#L32",
+            "instantiation": {
+              "path": "rm_description/urdf/standard3/standard3.urdf.xacro",
+              "line": 24,
+              "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard3/standard3.urdf.xacro#L24"
+            }
+          },
+          "reason": "Virtual optical frame tensor is non-PSD; retain its 1 g mass and full transform, approximate it as a point mass.",
+          "original_inertia": [
+            [
+              2.129e-09,
+              7.329e-09,
+              -1.11e-09
+            ],
+            [
+              7.329e-09,
+              2.198e-09,
+              -8.04e-09
+            ],
+            [
+              -1.11e-09,
+              -8.04e-09,
+              2.197e-09
+            ]
+          ],
+          "original_principal_inertia": [
+            -8.15792145541e-09,
+            1.05464842572e-09,
+            1.36272730297e-08
+          ],
+          "used_inertia": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "max_axis_inertia_change_bound_kg_m2": 1.36272730297e-08
+        }
+      ],
+      "axes": [
+        {
+          "joint": "yaw_joint",
+          "joint_source": {
+            "path": "rm_description/urdf/standard/gimbal.urdf.xacro",
+            "line": 29,
+            "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/gimbal.urdf.xacro#L29"
+          },
+          "world_axis": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "world_joint_origin_m": [
+            0.0,
+            0.0,
+            0.162
+          ],
+          "source_joint_limits_rad": [
+            -10000000000.0,
+            10000000000.0
+          ],
+          "validation_limits_rad": [
+            -0.5,
+            0.5
+          ],
+          "validation_interval_note": "Yaw uses chosen +/-0.5 rad test interval; not a claim of source limits.",
+          "frozen_pose": "All joint positions and velocities zero; base fixed; descendant actuated joints locked.",
+          "included_subtree_mass_kg": 1.33709,
+          "subtree_com_from_axis_world_m": [
+            0.0225042423556,
+            0.0005870054753,
+            0.116598130093
+          ],
+          "actual_gravity_drive_sin_nm": -0.0,
+          "actual_gravity_drive_cos_nm": -0.0,
+          "required_hold_torque_sin_nm": 0.0,
+          "required_hold_torque_cos_nm": 0.0,
+          "contributions": [
+            {
+              "link": "yaw",
+              "source": {
+                "path": "rm_description/urdf/standard/gimbal.urdf.xacro",
+                "line": 8,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/gimbal.urdf.xacro#L8"
+              },
+              "mass_kg": 0.2,
+              "com_from_axis_origin_world_m": [
+                -0.034,
+                0.002,
+                0.036
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  0.0004878,
+                  1.941e-05,
+                  0.000244
+                ],
+                [
+                  1.941e-05,
+                  0.0008322,
+                  -1.812e-05
+                ],
+                [
+                  0.000244,
+                  -1.812e-05,
+                  0.0004513
+                ]
+              ],
+              "center_projection_kg_m2": 0.0004513,
+              "parallel_axis_kg_m2": 0.000232,
+              "axis_inertia_kg_m2": 0.0006833
+            },
+            {
+              "link": "supply_frame",
+              "source": {
+                "path": "rm_description/urdf/standard/gimbal.urdf.xacro",
+                "line": 39,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/gimbal.urdf.xacro#L39"
+              },
+              "mass_kg": 0.0,
+              "com_from_axis_origin_world_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "com_orientation_world": [
+                [
+                  0.5,
+                  -0.866025403784,
+                  0.0
+                ],
+                [
+                  0.866025403784,
+                  0.5,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              ],
+              "center_projection_kg_m2": 0.0,
+              "parallel_axis_kg_m2": 0.0,
+              "axis_inertia_kg_m2": 0.0
+            },
+            {
+              "link": "pitch",
+              "source": {
+                "path": "rm_description/urdf/standard/gimbal.urdf.xacro",
+                "line": 46,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/gimbal.urdf.xacro#L46"
+              },
+              "mass_kg": 0.644,
+              "com_from_axis_origin_world_m": [
+                0.029,
+                0.000617,
+                0.1276
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  0.0018216,
+                  5.514e-06,
+                  0.000158
+                ],
+                [
+                  5.514e-06,
+                  0.00568,
+                  -6.628e-06
+                ],
+                [
+                  0.000158,
+                  -6.628e-06,
+                  0.004396
+                ]
+              ],
+              "center_projection_kg_m2": 0.004396,
+              "parallel_axis_kg_m2": 0.000541849163716,
+              "axis_inertia_kg_m2": 0.00493784916372
+            },
+            {
+              "link": "left_friction_wheel",
+              "source": {
+                "path": "rm_description/urdf/common/friction.urdf.xacro",
+                "line": 3,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/friction.urdf.xacro#L3",
+                "instantiation": {
+                  "path": "rm_description/urdf/standard/shooter.urdf.xacro",
+                  "line": 12,
+                  "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/shooter.urdf.xacro#L12"
+                }
+              },
+              "mass_kg": 0.15269,
+              "com_from_axis_origin_world_m": [
+                0.047,
+                0.0365,
+                0.1092
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  4.776e-05,
+                  2.192e-07,
+                  -1.28e-07
+                ],
+                [
+                  2.192e-07,
+                  4.759e-05,
+                  -1.683e-07
+                ],
+                [
+                  -1.28e-07,
+                  -1.683e-07,
+                  6.148e-05
+                ]
+              ],
+              "center_projection_kg_m2": 6.148e-05,
+              "parallel_axis_kg_m2": 0.0005407134625,
+              "axis_inertia_kg_m2": 0.0006021934625
+            },
+            {
+              "link": "right_friction_wheel",
+              "source": {
+                "path": "rm_description/urdf/common/friction.urdf.xacro",
+                "line": 3,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/friction.urdf.xacro#L3",
+                "instantiation": {
+                  "path": "rm_description/urdf/standard/shooter.urdf.xacro",
+                  "line": 16,
+                  "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/shooter.urdf.xacro#L16"
+                }
+              },
+              "mass_kg": 0.15269,
+              "com_from_axis_origin_world_m": [
+                0.047,
+                -0.0365,
+                0.1092
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  4.776e-05,
+                  2.192e-07,
+                  -1.28e-07
+                ],
+                [
+                  2.192e-07,
+                  4.759e-05,
+                  -1.683e-07
+                ],
+                [
+                  -1.28e-07,
+                  -1.683e-07,
+                  6.148e-05
+                ]
+              ],
+              "center_projection_kg_m2": 6.148e-05,
+              "parallel_axis_kg_m2": 0.0005407134625,
+              "axis_inertia_kg_m2": 0.0006021934625
+            },
+            {
+              "link": "camera_link",
+              "source": {
+                "path": "rm_description/urdf/common/camera.urdf.xacro",
+                "line": 3,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/camera.urdf.xacro#L3",
+                "instantiation": {
+                  "path": "rm_description/urdf/standard3/standard3.urdf.xacro",
+                  "line": 22,
+                  "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard3/standard3.urdf.xacro#L22"
+                }
+              },
+              "mass_kg": 0.17671,
+              "com_from_axis_origin_world_m": [
+                0.022,
+                0.0,
+                0.1787
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  2.129e-05,
+                  7.329e-08,
+                  -1.11e-07
+                ],
+                [
+                  7.329e-08,
+                  0.0002198,
+                  -8.04e-07
+                ],
+                [
+                  -1.11e-07,
+                  -8.04e-07,
+                  0.0002197
+                ]
+              ],
+              "center_projection_kg_m2": 0.0002197,
+              "parallel_axis_kg_m2": 8.552764e-05,
+              "axis_inertia_kg_m2": 0.00030522764
+            },
+            {
+              "link": "camera_optical_frame",
+              "source": {
+                "path": "rm_description/urdf/common/camera.urdf.xacro",
+                "line": 32,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/camera.urdf.xacro#L32",
+                "instantiation": {
+                  "path": "rm_description/urdf/standard3/standard3.urdf.xacro",
+                  "line": 24,
+                  "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard3/standard3.urdf.xacro#L24"
+                }
+              },
+              "mass_kg": 0.001,
+              "com_from_axis_origin_world_m": [
+                0.0655977517629,
+                0.000187,
+                0.17746327161
+              ],
+              "com_orientation_world": [
+                [
+                  0.0110594715322,
+                  -0.0843899275077,
+                  0.996371430855
+                ],
+                [
+                  -0.998545619763,
+                  0.0516496813858,
+                  0.0154581908376
+                ],
+                [
+                  -0.0527667825498,
+                  -0.99509328736,
+                  -0.083695974284
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              ],
+              "center_projection_kg_m2": 0.0,
+              "parallel_axis_kg_m2": 4.30310000534e-06,
+              "axis_inertia_kg_m2": 4.30310000534e-06
+            },
+            {
+              "link": "gimbal_imu",
+              "source": {
+                "path": "rm_description/urdf/common/imu.urdf.xacro",
+                "line": 4,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/imu.urdf.xacro#L4",
+                "instantiation": {
+                  "path": "rm_description/urdf/standard3/standard3.urdf.xacro",
+                  "line": 29,
+                  "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard3/standard3.urdf.xacro#L29"
+                }
+              },
+              "mass_kg": 0.01,
+              "com_from_axis_origin_world_m": [
+                -0.00918803405746,
+                -0.00126558490308,
+                0.142475749389
+              ],
+              "com_orientation_world": [
+                [
+                  0.0173107067372,
+                  0.994195705294,
+                  0.106184928345
+                ],
+                [
+                  -0.998913561629,
+                  0.0217923691614,
+                  -0.0411920992503
+                ],
+                [
+                  -0.0432670293245,
+                  -0.105356500614,
+                  0.993492814243
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  1e-06,
+                  -3.30872245021e-24,
+                  -1.32348898008e-23
+                ],
+                [
+                  0.0,
+                  1e-06,
+                  0.0
+                ],
+                [
+                  -2.64697796017e-23,
+                  0.0,
+                  1e-06
+                ]
+              ],
+              "center_projection_kg_m2": 1e-06,
+              "parallel_axis_kg_m2": 8.6021674988e-07,
+              "axis_inertia_kg_m2": 1.86021674988e-06
+            }
+          ],
+          "profile": {
+            "model": "dynamicx_standard3",
+            "axis": "yaw",
+            "inertia_kg_m2": 0.00713692704547,
+            "gravity_sin_nm": 0.0,
+            "gravity_cos_nm": 0.0,
+            "min_rad": -0.5,
+            "max_rad": 0.5
+          }
+        },
+        {
+          "joint": "pitch_joint",
+          "joint_source": {
+            "path": "rm_description/urdf/standard/gimbal.urdf.xacro",
+            "line": 67,
+            "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/gimbal.urdf.xacro#L67"
+          },
+          "world_axis": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "world_joint_origin_m": [
+            0.0,
+            0.0,
+            0.252
+          ],
+          "source_joint_limits_rad": [
+            -0.72,
+            0.457
+          ],
+          "validation_limits_rad": [
+            -0.72,
+            0.457
+          ],
+          "validation_interval_note": "Pitch limits copied from source model.",
+          "frozen_pose": "All joint positions and velocities zero; base fixed; descendant actuated joints locked.",
+          "included_subtree_mass_kg": 1.13709,
+          "subtree_com_from_axis_world_m": [
+            0.0324426363887,
+            0.000338477298164,
+            0.0407743395558
+          ],
+          "actual_gravity_drive_sin_nm": 0.45483175984,
+          "actual_gravity_drive_cos_nm": 0.361892836604,
+          "required_hold_torque_sin_nm": -0.45483175984,
+          "required_hold_torque_cos_nm": -0.361892836604,
+          "contributions": [
+            {
+              "link": "pitch",
+              "source": {
+                "path": "rm_description/urdf/standard/gimbal.urdf.xacro",
+                "line": 46,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/gimbal.urdf.xacro#L46"
+              },
+              "mass_kg": 0.644,
+              "com_from_axis_origin_world_m": [
+                0.029,
+                0.000617,
+                0.0376
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  0.0018216,
+                  5.514e-06,
+                  0.000158
+                ],
+                [
+                  5.514e-06,
+                  0.00568,
+                  -6.628e-06
+                ],
+                [
+                  0.000158,
+                  -6.628e-06,
+                  0.004396
+                ]
+              ],
+              "center_projection_kg_m2": 0.00568,
+              "parallel_axis_kg_m2": 0.00145206544,
+              "axis_inertia_kg_m2": 0.00713206544
+            },
+            {
+              "link": "left_friction_wheel",
+              "source": {
+                "path": "rm_description/urdf/common/friction.urdf.xacro",
+                "line": 3,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/friction.urdf.xacro#L3",
+                "instantiation": {
+                  "path": "rm_description/urdf/standard/shooter.urdf.xacro",
+                  "line": 12,
+                  "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/shooter.urdf.xacro#L12"
+                }
+              },
+              "mass_kg": 0.15269,
+              "com_from_axis_origin_world_m": [
+                0.047,
+                0.0365,
+                0.0192
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  4.776e-05,
+                  2.192e-07,
+                  -1.28e-07
+                ],
+                [
+                  2.192e-07,
+                  4.759e-05,
+                  -1.683e-07
+                ],
+                [
+                  -1.28e-07,
+                  -1.683e-07,
+                  6.148e-05
+                ]
+              ],
+              "center_projection_kg_m2": 4.759e-05,
+              "parallel_axis_kg_m2": 0.0003935798516,
+              "axis_inertia_kg_m2": 0.0004411698516
+            },
+            {
+              "link": "right_friction_wheel",
+              "source": {
+                "path": "rm_description/urdf/common/friction.urdf.xacro",
+                "line": 3,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/friction.urdf.xacro#L3",
+                "instantiation": {
+                  "path": "rm_description/urdf/standard/shooter.urdf.xacro",
+                  "line": 16,
+                  "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard/shooter.urdf.xacro#L16"
+                }
+              },
+              "mass_kg": 0.15269,
+              "com_from_axis_origin_world_m": [
+                0.047,
+                -0.0365,
+                0.0192
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  4.776e-05,
+                  2.192e-07,
+                  -1.28e-07
+                ],
+                [
+                  2.192e-07,
+                  4.759e-05,
+                  -1.683e-07
+                ],
+                [
+                  -1.28e-07,
+                  -1.683e-07,
+                  6.148e-05
+                ]
+              ],
+              "center_projection_kg_m2": 4.759e-05,
+              "parallel_axis_kg_m2": 0.0003935798516,
+              "axis_inertia_kg_m2": 0.0004411698516
+            },
+            {
+              "link": "camera_link",
+              "source": {
+                "path": "rm_description/urdf/common/camera.urdf.xacro",
+                "line": 3,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/camera.urdf.xacro#L3",
+                "instantiation": {
+                  "path": "rm_description/urdf/standard3/standard3.urdf.xacro",
+                  "line": 22,
+                  "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard3/standard3.urdf.xacro#L22"
+                }
+              },
+              "mass_kg": 0.17671,
+              "com_from_axis_origin_world_m": [
+                0.022,
+                0.0,
+                0.0887
+              ],
+              "com_orientation_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  2.129e-05,
+                  7.329e-08,
+                  -1.11e-07
+                ],
+                [
+                  7.329e-08,
+                  0.0002198,
+                  -8.04e-07
+                ],
+                [
+                  -1.11e-07,
+                  -8.04e-07,
+                  0.0002197
+                ]
+              ],
+              "center_projection_kg_m2": 0.0002198,
+              "parallel_axis_kg_m2": 0.0014758271399,
+              "axis_inertia_kg_m2": 0.0016956271399
+            },
+            {
+              "link": "camera_optical_frame",
+              "source": {
+                "path": "rm_description/urdf/common/camera.urdf.xacro",
+                "line": 32,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/camera.urdf.xacro#L32",
+                "instantiation": {
+                  "path": "rm_description/urdf/standard3/standard3.urdf.xacro",
+                  "line": 24,
+                  "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard3/standard3.urdf.xacro#L24"
+                }
+              },
+              "mass_kg": 0.001,
+              "com_from_axis_origin_world_m": [
+                0.0655977517629,
+                0.000187,
+                0.0874632716098
+              ],
+              "com_orientation_world": [
+                [
+                  0.0110594715322,
+                  -0.0843899275077,
+                  0.996371430855
+                ],
+                [
+                  -0.998545619763,
+                  0.0516496813858,
+                  0.0154581908376
+                ],
+                [
+                  -0.0527667825498,
+                  -0.99509328736,
+                  -0.083695974284
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              ],
+              "center_projection_kg_m2": 0.0,
+              "parallel_axis_kg_m2": 1.1952888917e-05,
+              "axis_inertia_kg_m2": 1.1952888917e-05
+            },
+            {
+              "link": "gimbal_imu",
+              "source": {
+                "path": "rm_description/urdf/common/imu.urdf.xacro",
+                "line": 4,
+                "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/common/imu.urdf.xacro#L4",
+                "instantiation": {
+                  "path": "rm_description/urdf/standard3/standard3.urdf.xacro",
+                  "line": 29,
+                  "url": "https://github.com/rm-controls/rm_description/blob/a4b31828bf964e491d3ba5a731d12c1213562feb/urdf/standard3/standard3.urdf.xacro#L29"
+                }
+              },
+              "mass_kg": 0.01,
+              "com_from_axis_origin_world_m": [
+                -0.00918803405746,
+                -0.00126558490308,
+                0.0524757493888
+              ],
+              "com_orientation_world": [
+                [
+                  0.0173107067372,
+                  0.994195705294,
+                  0.106184928345
+                ],
+                [
+                  -0.998913561629,
+                  0.0217923691614,
+                  -0.0411920992503
+                ],
+                [
+                  -0.0432670293245,
+                  -0.105356500614,
+                  0.993492814243
+                ]
+              ],
+              "inertia_about_com_world": [
+                [
+                  1e-06,
+                  -3.30872245021e-24,
+                  -1.32348898008e-23
+                ],
+                [
+                  0.0,
+                  1e-06,
+                  0.0
+                ],
+                [
+                  -2.64697796017e-23,
+                  0.0,
+                  1e-06
+                ]
+              ],
+              "center_projection_kg_m2": 1e-06,
+              "parallel_axis_kg_m2": 2.83812424376e-05,
+              "axis_inertia_kg_m2": 2.93812424376e-05
+            }
+          ],
+          "profile": {
+            "model": "dynamicx_standard3",
+            "axis": "pitch",
+            "inertia_kg_m2": 0.00975136641445,
+            "gravity_sin_nm": -0.45483175984,
+            "gravity_cos_nm": -0.361892836604,
+            "min_rad": -0.72,
+            "max_rad": 0.457
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "qualification": "Synthetic single-axis model regression; no hardware measurements",
+  "cases": 576,
+  "status_counts": {
+    "PASS": 576
+  },
+  "all_cases_pass": true,
+  "max_rms_after_1s_rad": 0.00316145773,
+  "max_peak_after_1s_rad": 0.00540026729,
+  "max_wire_torque_nm": 0.673928284,
+  "sources": {
+    "metrics": "build-release/open_model_metrics.csv",
+    "trace": "build-release/open_model_trace.csv"
+  }
+}
