@@ -37,7 +37,12 @@ def scale(a, s):
 
 
 def dot(a, b):
-    return sum(x * y for x, y in zip(a, b))
+    # Keep the audit arithmetic order stable across Python versions: Python
+    # 3.12 changed float sum(), including residuals of rotated zero entries.
+    result = 0.0
+    for x, y in zip(a, b):
+        result += x * y
+    return result
 
 
 def cross(a, b):
