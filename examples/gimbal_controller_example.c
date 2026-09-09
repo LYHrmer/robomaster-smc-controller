@@ -85,8 +85,10 @@ gimbal_motor_status_t gimbal_example_dm_command(
 {
     float applied;
     if (frame != NULL) memset(frame, 0, sizeof(*frame));
-    if (frame == NULL || phase < GIMBAL_EXAMPLE_DM_DISABLED ||
-        phase > GIMBAL_EXAMPLE_DM_FAULT) return GIMBAL_MOTOR_BAD_ARGUMENT;
+    /* Enum signedness differs across host/Arm ABIs. One unsigned range check
+     * rejects both negative casts and values above the last valid phase. */
+    if (frame == NULL || (unsigned int)phase > (unsigned int)GIMBAL_EXAMPLE_DM_FAULT)
+        return GIMBAL_MOTOR_BAD_ARGUMENT;
     if (phase == GIMBAL_EXAMPLE_DM_ARMING) return GIMBAL_MOTOR_NOT_ENABLED;
     if (phase != GIMBAL_EXAMPLE_DM_RUNNING || output == NULL || !output->valid)
         return gimbal_dm4310_pack_enable(cfg, 0u, frame);

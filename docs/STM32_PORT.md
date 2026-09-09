@@ -6,7 +6,7 @@
 
 ## 1. 加入源文件
 
-将 `src/gimbal_smc.c`、`src/gimbal_motor.c` 及需要时的 `examples/gimbal_controller_example.c` 加入工程，添加 `include/`、`examples/` 头文件路径。Keil/IAR 开启对应的 C99 支持；GCC 链接 `libm`。
+将 `src/gimbal_smc.c`、`src/gimbal_motor.c` 及需要时的 `examples/gimbal_controller_example.c` 加入工程，添加 `include/`、`examples/` 头文件路径。采用 Pitch 专用接入时再加入 `src/gimbal_pitch.c` 和 `examples/gimbal_pitch_example.c`。Keil/IAR 开启对应的 C99 支持；GCC 链接 `libm`。
 
 每轴一个静态 `gimbal_example_axis_t`，Yaw、Pitch 分开提供控制器与参考生成器配置。上电只初始化对象，不在初始化算法时自动发送电机使能。默认参数是示例，需替换机构惯量、力矩上限和参考限制。
 
@@ -61,7 +61,9 @@ gimbal_example_axis_step(&yaw_axis, &yaw_snapshot,
                         yaw_target_rad, 0.0f, &yaw_out);
 ```
 
-Pitch 对应调用传入辨识后的 `gravity_feedforward_nm`。只有一个闭环能在当前模式驱动同一电机；进入 SMC 分支后不要再对其 N·m 输出串接旧速度 PID。`given_current` 是协议整数容器，不要把浮点力矩直接截断写进去。
+Pitch 可使用独立的 `gimbal_pitch_example_step()`：接收控制角、重力相位、机械相对角及其反馈年龄，计算保持力矩并约束当前快照下的参考范围。完整可编译接口和官方框架调用见 [Pitch 接入与整定](PITCH_TUNING.md#3-官方-c-板框架的完整接法)。它不替代机械制动与上层限位监督；需要完整三维重力模型时仍可向通用核心传入应用层计算的前馈。
+
+只有一个闭环能在当前模式驱动同一电机；进入 SMC 分支后不要再对其 N·m 输出串接旧速度 PID。`given_current` 是协议整数容器，不要把浮点力矩直接截断写进去。
 
 上层有解析参考速度/加速度时，直接使用 `gimbal_smc_update()`，避免重复经过位置跟踪器。目标丢失、遥控失联、机械越限等应在模式管理器中明确定义保持、回中或禁用行为。
 
@@ -96,7 +98,7 @@ if (ys >= 0 && ps >= 0 &&
 
 旧官方 `CAN_cmd_gimbal()` 的电压组 ID 不适合新的电流模式。若原组中还包含拨弹或其他类型电机，必须按各自协议重新分组，不能整体迁移到 `0x1FE`。同时规划反馈 ID：例如 GM6020 的 `0x205` 与同总线上其他 DJI 电机的反馈可能冲突。主机库无法代替整车 CAN 地址规划。
 
-方向只反转一次：在 SMC 分支采用电机 `mechanics.direction` 后，绕过旧例程对该分支的 `YAW_MOTOR_REVERSE`/`PITCH_MOTOR_REVERSE` 输出再取反。其他保留的旧模式仍按自身方向约定处理。
+输出方向只反转一次：在 SMC 分支采用电机 `mechanics.direction` 后，绕过官方 `YAW_TURN`/`PITCH_TURN` 对该分支输出的再次取反。保留已经校准到统一正方向的编码器反馈变换；不要为绕过输出反转而直接关闭这些也参与反馈/零位处理的宏。其他保留的旧模式仍按自身方向约定处理。
 
 ## 5. bxCAN HAL 发送桥
 

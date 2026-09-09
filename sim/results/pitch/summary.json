@@ -1,0 +1,184 @@
+{
+  "qualification": "Synthetic single-axis pitch validation; no hardware, three-axis or soft-limit certification",
+  "case_count": 24,
+  "raw_status_counts": {
+    "PASS": 24
+  },
+  "gates_rad": {
+    "each_direction_rms_exclusive": 0.02,
+    "each_direction_peak_exclusive": 0.06
+  },
+  "tracking_startup_exclusion_s": [
+    0,
+    1
+  ],
+  "note": "Diagnostic PASS does not establish a correct coordinate transform or acceptable deployment.",
+  "sources": {
+    "metrics": {
+      "path": "build-release/pitch_metrics.csv",
+      "sha256": "47fbd9ee2fbe230d3a234f41f6697eae4f26322bd18c27acbcaf17ebf7ef5584"
+    },
+    "trace": {
+      "path": "build-release/pitch_trace.csv",
+      "sha256": "51e84af7aba999e7d2da6ffa0667cec59f6618af387a364c239b92240d36cce3"
+    }
+  },
+  "groups": {
+    "acceptance": {
+      "cases": 20,
+      "status_counts": {
+        "PASS": 20
+      },
+      "max_directional_rms_rad": {
+        "value": 0.0092629865,
+        "field": "up_rms_rad",
+        "case": {
+          "model": "rmoss_rmua19",
+          "motor": "DM4310",
+          "condition": "gravity_over20",
+          "role": "acceptance",
+          "status": "PASS"
+        }
+      },
+      "max_directional_peak_rad": {
+        "value": 0.0197250365,
+        "field": "up_peak_rad",
+        "case": {
+          "model": "rmoss_rmua19",
+          "motor": "GM6020",
+          "condition": "gravity_over20",
+          "role": "acceptance",
+          "status": "PASS"
+        }
+      },
+      "max_wire_torque_nm": {
+        "value": 0.688039124,
+        "field": "peak_wire_nm",
+        "case": {
+          "model": "dynamicx_standard3",
+          "motor": "GM6020",
+          "condition": "tilted_correct",
+          "role": "acceptance",
+          "status": "PASS"
+        }
+      },
+      "max_saturation_ratio": {
+        "value": 0.0,
+        "field": "saturation_ratio",
+        "case": {
+          "model": "rmoss_rmua19",
+          "motor": "GM6020",
+          "condition": "nominal",
+          "role": "acceptance",
+          "status": "PASS"
+        }
+      },
+      "min_hard_margin_rad": {
+        "value": 0.0738692113,
+        "field": "min_hard_margin_rad",
+        "case": {
+          "model": "rmoss_rmua19",
+          "motor": "DM4310",
+          "condition": "gravity_over20",
+          "role": "acceptance",
+          "status": "PASS"
+        }
+      },
+      "min_reference_interval_margin_rad": {
+        "value": -0.00613078866,
+        "field": "min_reference_interval_margin_rad",
+        "case": {
+          "model": "rmoss_rmua19",
+          "motor": "DM4310",
+          "condition": "gravity_over20",
+          "role": "acceptance",
+          "status": "PASS"
+        }
+      }
+    },
+    "diagnostic": {
+      "cases": 4,
+      "status_counts": {
+        "PASS": 4
+      },
+      "max_directional_rms_rad": {
+        "value": 0.00474666831,
+        "field": "down_rms_rad",
+        "case": {
+          "model": "dynamicx_standard3",
+          "motor": "GM6020",
+          "condition": "tilted_wrong_frame",
+          "role": "diagnostic",
+          "status": "PASS"
+        }
+      },
+      "max_directional_peak_rad": {
+        "value": 0.00799322165,
+        "field": "up_peak_rad",
+        "case": {
+          "model": "rmoss_rmua19",
+          "motor": "DM4310",
+          "condition": "tilted_wrong_frame",
+          "role": "diagnostic",
+          "status": "PASS"
+        }
+      },
+      "max_wire_torque_nm": {
+        "value": 0.593406593,
+        "field": "peak_wire_nm",
+        "case": {
+          "model": "dynamicx_standard3",
+          "motor": "DM4310",
+          "condition": "tilted_wrong_frame",
+          "role": "diagnostic",
+          "status": "PASS"
+        }
+      },
+      "max_saturation_ratio": {
+        "value": 0.0,
+        "field": "saturation_ratio",
+        "case": {
+          "model": "rmoss_rmua19",
+          "motor": "GM6020",
+          "condition": "tilted_wrong_frame",
+          "role": "diagnostic",
+          "status": "PASS"
+        }
+      },
+      "min_hard_margin_rad": {
+        "value": 0.0782965209,
+        "field": "min_hard_margin_rad",
+        "case": {
+          "model": "dynamicx_standard3",
+          "motor": "GM6020",
+          "condition": "tilted_wrong_frame",
+          "role": "diagnostic",
+          "status": "PASS"
+        }
+      },
+      "min_reference_interval_margin_rad": {
+        "value": -0.00170347909,
+        "field": "min_reference_interval_margin_rad",
+        "case": {
+          "model": "dynamicx_standard3",
+          "motor": "GM6020",
+          "condition": "tilted_wrong_frame",
+          "role": "diagnostic",
+          "status": "PASS"
+        }
+      }
+    }
+  },
+  "standard3_wrong_over_correct_rms_ratio": {
+    "GM6020": {
+      "up": 1.6809067000434323,
+      "down": 7.190430103355379,
+      "hold": 2.786456824005724
+    },
+    "DM4310": {
+      "up": 1.6811462183573707,
+      "down": 7.208617101126472,
+      "hold": 2.7889623404395656
+    }
+  }
+}

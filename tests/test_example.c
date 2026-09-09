@@ -40,6 +40,12 @@ int main(void)
     assert(gimbal_example_dm_command(&dm, GIMBAL_EXAMPLE_DM_ARMING,
                                      &out, &frame) == GIMBAL_MOTOR_NOT_ENABLED);
     assert(frame.dlc == 0u);
+    assert(gimbal_example_dm_command(&dm, (gimbal_example_dm_phase_t)-1,
+                                     &out, &frame) == GIMBAL_MOTOR_BAD_ARGUMENT);
+    assert(frame.dlc == 0u);
+    assert(gimbal_example_dm_command(&dm, (gimbal_example_dm_phase_t)(GIMBAL_EXAMPLE_DM_FAULT + 1),
+                                     &out, &frame) == GIMBAL_MOTOR_BAD_ARGUMENT);
+    assert(frame.dlc == 0u);
 
     s.feedback_age_s = 0.0f;
     s.angle_rad = -0.7f;
