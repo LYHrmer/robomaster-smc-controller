@@ -1,12 +1,25 @@
 # RoboMaster 云台滑模控制器设计
 
+[文档导航](README.md) · [项目首页](../README.md)
+
 本项目提供运行于 STM32 的独立 C99 控制器。Yaw、Pitch 各使用一个实例，共用算法，分别配置机构参数。默认使用带边界层的线性滑模，提供正则化终端项选项。DM4310 使用 MIT 力矩指令，GM6020 使用已启用的电流控制模式。
 
 这是一份可编译、可测试的控制器工程设计。本文的数值算例属于合成仿真；尚无本项目的实机调参、跟踪精度或 MCU 执行时间测量。
 
+本文解释“公式如何对应 C 接口，以及如何开始整定”。按当前任务选择入口：
+
+| 你要做的事 | 建议先读 |
+|---|---|
+| 理解控制律与参数单位 | [模型与单位](#2-模型坐标与单位) → [线性滑模](#3-线性滑模设计) |
+| 把目标、反馈接入控制周期 | [离散实现与参考输入](#5-离散实现与参考输入) → [STM32 接入](STM32_PORT.md) |
+| 调试 Pitch 的重力与行程 | [整定顺序](#7-整定顺序与记录) → [Pitch 专项说明](PITCH_TUNING.md) |
+| 评估已有验证能说明什么 | [验证范围与复现](VALIDATION.md) |
+
+控制器核心及参考生成器的声明集中在 [gimbal_smc.h](../include/gimbal_smc.h)；其输出是力矩，CAN 转换见 [电机适配](MOTOR_PROTOCOL.md)。
+
 ## 1. 参考项目与优化边界
 
-主要参考：[复旦大学·星云 EGA 云台滑模开源](https://github.com/xinruilee04/smc_controller)，核对版本 `a5ad3746196fd1683af0da2ab1b1a87d419e884b`；原作者为李欣睿，相关教学文章见 [RoboMaster 社区](https://bbs.robomaster.com/article/1939327?source=1)。本库按控制原理重新实现 C API，没有附带原 C++ 文件，也不继承原示例的经验参数。
+主要参考：[复旦大学星云 EGA 云台滑模开源](https://github.com/xinruilee04/smc_controller)，核对版本 `a5ad3746196fd1683af0da2ab1b1a87d419e884b`；相关教学文章见 [RoboMaster 社区](https://bbs.robomaster.com/article/1939327?source=1)。本库按控制原理重新实现 C API，没有附带原 C++ 文件，也不继承原示例的经验参数。
 
 | 原实现中的做法 | 本库的处理 | 工程意义 |
 |---|---|---|
@@ -25,23 +38,29 @@
 
 在一轴的有效工作范围内，采用：
 
-\[
+$$
 \dot\theta=\omega,\qquad
 J\dot\omega=\tau-B\omega-\tau_g(q)+d(t).
-\]
+$$
 
 `theta` 是选定受控坐标中的角度，`omega` 必须是它的时间导数；`tau` 是同一正方向的关节输出力矩。`J` 是负载、转子及传动反射到该坐标的等效惯量，不能直接拿电机转子惯量代替整套云台惯量。`B` 是该近似模型的粘性阻尼。
 
-| 量 | 单位 |
-|---|---|
-| θ、参考角 θr | rad |
-| ω、参考角速度 ωr、滑模面 s | rad/s |
-| 参考加速度 αr、切换增益 η | rad/s² |
-| J | kg·m² |
-| B | N·m·s/rad |
-| τ、τff、τg | N·m（关节侧） |
-| λ、k | 1/s |
-| 边界层 φ | rad/s |
+公式中的模型估计值与 C 配置一一对应。表中的输入、配置和输出字段分别属于 `gimbal_smc_input_t`、`gimbal_smc_config_t` 和 `gimbal_smc_output_t`。
+
+| 量 | 单位 | C 字段 |
+|---|---|---|
+| θ、参考角 θr | rad | 输入 `angle_rad`、`reference_rad` |
+| ω、参考角速度 ωr | rad/s | 输入 `rate_rad_s`、`reference_rate_rad_s` |
+| 参考加速度 αr | rad/s² | 输入 `reference_accel_rad_s2` |
+| 滑模面 s | rad/s | 输出 `sliding_rad_s` |
+| 估计惯量 Ĵ | kg·m² | 配置 `inertia_kg_m2` |
+| 估计阻尼 B̂ | N·m·s/rad | 配置 `viscous_nm_s_rad` |
+| 控制力矩 τ、外部前馈 τff | N·m（关节侧） | 输出 `torque_nm`、输入 `feedforward_nm` |
+| λ、k | 1/s | 配置 `lambda_per_s`、`reaching_per_s` |
+| 切换增益 η | rad/s² | 配置 `robust_rad_s2` |
+| 边界层 φ | rad/s | 配置 `boundary_rad_s` |
+
+`tau_g` 表示真实重力负载，其估计补偿由应用层放入 `feedforward_nm`；核心已单独计算配置的 `B̂ * omega`，不要在前馈里重复加入同一项。
 
 Yaw 稳定控制通常使用惯性姿态和对应惯性角速度；电机编码器角度是电机相对底座的位置，不能与未经变换的惯性陀螺直接混配。较大俯仰角时，陀螺本体系角速度也不等于欧拉 yaw/pitch 的导数，需要姿态运动学变换或使用相应轴的投影模型。机械限位应另外使用关节相对角度判断。
 
@@ -53,32 +72,32 @@ Yaw/Pitch 分轴是工作区间内的近似。耦合、底盘加速、线缆摩�
 
 定义：
 
-\[
+$$
 e=\theta-\theta_r,\quad \dot e=\omega-\omega_r,
 \quad s=\dot e+\lambda e.
-\]
+$$
 
 控制律为：
 
-\[
+$$
 \tau_{raw}=\hat J[\alpha_r-\lambda\dot e-ks
 -\eta\operatorname{sat}(s/\phi)]+\hat B\omega+\tau_{ff}.
-\]
+$$
 
 其中 `sat(x)=clamp(x,-1,1)`，常规整定取 `lambda,k,phi>0`，`eta>=0`。API 允许单独关闭 `k` 或 `eta` 用于诊断；两者同时为零时没有趋近作用，不能期望位置误差收敛。`eta=0,k>0` 时退化为相应的连续线性反馈，可用于初始模型和方向检查；实际抗扰滑模整定通常取正切换增益。
 
 令名义惯量、阻尼及前馈一致，并将未补偿的作用折合为加速度扰动 `Delta`：
 
-\[
+$$
 \dot s=-ks-\eta\operatorname{sat}(s/\phi)+\Delta(t),
 \qquad |\Delta(t)|\le D.
-\]
+$$
 
 取 `V=s²/2`，在 `|s|>phi` 时：
 
-\[
+$$
 \dot V\le -ks^2-(\eta-D)|s|.
-\]
+$$
 
 `eta>D` 是一种便于使用的充分抗扰条件。模型不匹配也必须包含在 `D` 中；只写“忽略扰动后 Vdot<=0”不能证明真实负载下的鲁棒性。
 
@@ -90,23 +109,37 @@ e=\theta-\theta_r,\quad \dot e=\omega-\omega_r,
 
 定义连续可微函数：
 
-\[
+$$
 f(e)=\lambda e+\alpha e(e^2+\delta^2)^{(r-1)/2},
 \quad 0<r<1,\ \delta>0.
-\]
+$$
 
-\[
+$$
 f'(e)=\lambda+\alpha(e^2+\delta^2)^{(r-3)/2}
 (\delta^2+re^2).
-\]
+$$
 
 使用 `s=edot+f(e)`，将线性控制律中的 `lambda*edot` 换为 `f'(e)*edot`。这样代码中的滑模面与其导数严格配对，在负误差和零点均有定义。`alpha` 的单位为 `rad^(1-r)/s`，`delta` 的单位为 rad。
+
+本节的 `alpha` 是终端增益，对应 `terminal_gain`，与参考加速度 `alpha_r` 不同；`r`、`delta` 分别对应 `terminal_power`、`terminal_epsilon_rad`。
 
 当 `|e|>>delta` 时，终端项近似 `alpha*|e|^r*sign(e)`；当 `e≈0` 时，等效斜率为 `lambda+alpha*delta^(r-1)`，有限但可能很大。`delta` 过小仍会放大噪声及离散时间敏感性。
 
 正则化后近原点为线性行为，不保留理想终端面严格有限时间归零的宣称。默认关闭该项：先将线性滑模调稳，再比较是否值得增加 `powf` 的运行成本与额外参数。
 
 ## 5. 离散实现与参考输入
+
+每轴保存独立的控制器状态，初始化一次，在所属控制任务中按以下顺序调用：
+
+```text
+同一时刻的角度、角速度、反馈年龄与实际 dt
+                    +
+参考状态 (角度、角速度、加速度) 与外部力矩前馈
+                    ↓
+gimbal_smc_update() → 检查 output.valid / output.flags
+                    ↓
+关节力矩 → 电机转换与 CAN 组包 → 应用层发送
+```
 
 建议从 1 kHz 周期开始评估，具体周期受传感器、CAN 负载和 MCU 时间预算约束。控制函数每拍传入实际 `dt_s`，检查是否处于配置区间；不要把 FreeRTOS tick 数直接当秒。
 
@@ -116,15 +149,17 @@ f'(e)=\lambda+\alpha(e^2+\delta^2)^{(r-3)/2}
 
 输出顺序是名义控制律、幅值/变化率约束，再进入电机适配。禁用、反馈过期、非法数值或周期异常会直接返回零力矩，绕过正常斜率限制。调用方必须检查返回状态并实际发送零指令或执行其上层故障策略；函数返回零不代表 CAN 已发送成功。
 
+`output.valid=true` 仍可能伴随 `GIMBAL_SMC_AMPLITUDE_LIMIT` 或 `GIMBAL_SMC_SLEW_LIMIT`；这表示有效但受限的输出，应记录限幅原因。`valid=false` 时不要继续使用上一拍的有效输出。`gimbal_smc_reset()` 清除动态状态并保留配置，不负责电机使能或故障恢复授权。
+
 Yaw 的最短路角误差仅适合可跨 ±π 的角度；多圈绝对控制应使用连续角度并关闭 wrap。Pitch 机械限位不能通过 wrap 处理。长期连续多圈角使用单精度时应进行坐标重定位，避免浮点分辨率损失。
 
 ## 6. 两种电机的共同力矩接口
 
 若 `g=电机轴速度/关节速度`，传动效率为 `eff`，方向符号 `dir=±1`，则：
 
-\[
+$$
 \tau_m=\frac{dir\,\tau_j}{g\,eff}.
-\]
+$$
 
 DM4310 的 MIT 力矩按固件文档对应的输出轴口径使用，外部 `g` 不要重复计入电机内部已经定义的减速比。GM6020 的电流模式再使用 `I=tau_m/Kt`。该静态转换只在所用扭矩常数、驱动工作模式和工作区间相符时成立。
 

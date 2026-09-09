@@ -1,10 +1,12 @@
 # 参考与致谢
 
+[文档导航](README.md) · [项目首页](../README.md)
+
 本库的 C 控制器与协议编解码按原理独立实现，不附带原滑模 C++ 源码、厂商 PDF 或完整官方例程。为复现开源参数验证，`sim/open_models/sources/` 额外归档了两份开源机器人模型的必要原始文件及其许可，保留原有 BSD-3-Clause/Apache-2.0 条款；这些文件不改授 MIT。以下为主要来源，框架接口补充核验日期为 2026-09-09。
 
 | 来源 | 本项目借鉴或核对的内容 |
 |---|---|
-| [李欣睿 / 复旦大学星云 EGA 滑模开源](https://github.com/xinruilee04/smc_controller/tree/a5ad3746196fd1683af0da2ab1b1a87d419e884b) | 云台单轴模型、线性/终端滑模、原实现周期与状态审查 |
+| [复旦大学星云 EGA 滑模开源](https://github.com/xinruilee04/smc_controller/tree/a5ad3746196fd1683af0da2ab1b1a87d419e884b) | 云台单轴模型、线性/终端滑模、原实现周期与状态审查 |
 | [对应教学文章](https://bbs.robomaster.com/article/1939327?source=1) | 项目来源和作者归属；网页标示 CC BY-NC-SA 4.0，本仓库不转载文章正文 |
 | [RoboMaster 官方 19.gimbal_task](https://github.com/RoboMaster/Development-Board-C-Examples/blob/59d12b1adcd321dbf1f9e9166aef5eb95ab657bf/19.gimbal_task/application/gimbal_task.c) | 主接入框架、反馈坐标转换、模式与计算顺序；机械相对角和绝对角目标偏差的限位映射 |
 | [官方 gimbal_task.h](https://github.com/RoboMaster/Development-Board-C-Examples/blob/master/20.standard_robot/application/gimbal_task.h) | 云台角度/角速度字段和单位 |

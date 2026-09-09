@@ -1,145 +1,105 @@
 # RoboMaster SMC Controller
 
+**面向 STM32 云台的纯 C99 滑模控制器库，提供 DM4310 与 GM6020 力矩适配。**
+
 [![C99 controller tests](https://github.com/LYHrmer/robomaster-smc-controller/actions/workflows/c-tests.yml/badge.svg)](https://github.com/LYHrmer/robomaster-smc-controller/actions/workflows/c-tests.yml)
+[![C99](https://img.shields.io/badge/language-C99-blue)](include/gimbal_smc.h)
+[![Code license MIT](https://img.shields.io/badge/code_license-MIT-green)](LICENSE)
 
-面向 RoboMaster 云台的 **纯 C99 滑模控制器库**，支持 DM4310 MIT 力矩模式与 GM6020 原生电流模式，优先提供 RoboMaster 官方 C 型开发板例程的接入方法。
+[快速开始](docs/QUICKSTART.md) · [STM32 接入](docs/STM32_PORT.md) · [Pitch 整定](docs/PITCH_TUNING.md) · [全部文档](docs/README.md)
 
-核心无 HAL、RTOS、堆内存和 C++ 依赖。Yaw、Pitch 可独立实例化，分别整定；电机更换通过适配层完成。Pitch 提供独立的重力补偿与接入示例，区分控制姿态、重力相位和机械相对角，见 [Pitch 接入与整定](docs/PITCH_TUNING.md)。
+把同一坐标系下的**目标、角度和角速度**交给控制器，得到关节力矩 **N·m**，再由电机适配器转换为 CAN 命令。算法无 HAL、RTOS、堆内存或 C++ 依赖；原工程继续负责模式管理、INS 和 CAN 发送。
 
-**当前状态：主机 Debug／Release／ASan+UBSan 均通过 9 项测试，Cortex-M4F 四个静态库已交叉编译。** 验证包含两份开源模型的 576 个闭环组合，以及 [20 个 Pitch 验收场景和 4 个错误坐标诊断](docs/PITCH_VALIDATION.md)；尚无本公共库的硬件／MCU 时序测量。模型参数有来源和离线复算过程，电机、延迟、噪声与整定仍需匹配自己的云台。
+Yaw、Pitch 分别使用独立实例与参数。优先提供 [RoboMaster 官方 C 型开发板例程](https://github.com/RoboMaster/Development-Board-C-Examples)的接入方法，适合已有电控框架、希望替换或比较云台闭环的开发者。
 
-单轴接口可以增加更多实例；多轴目标分配、姿态变换和轴间耦合补偿仍需在应用层实现。本轮没有进行三轴联动验证。
+## 从这里开始
 
-## 设计来源与改进
+| 你想做什么 | 阅读入口 |
+|---|---|
+| 先在电脑上运行，再了解接口 | [快速开始](docs/QUICKSTART.md) |
+| 接到官方 C 板 / 自己的 STM32 工程 | [移植步骤](docs/STM32_PORT.md) → [电机协议与模式](docs/MOTOR_PROTOCOL.md) |
+| 调整 Pitch 重力补偿、上下行程和参考限制 | [Pitch 接入与整定](docs/PITCH_TUNING.md) |
+| 理解公式、参数含义与改进 | [控制器设计](docs/CONTROL_DESIGN.md) |
+| 查看仿真依据、结果及当前局限 | [验证记录](docs/VALIDATION.md) |
+| 了解大小 Yaw / 折叠双 Pitch 如何扩展 | [多轴扩展方向](docs/MULTI_AXIS.md)（规划阶段） |
 
-参考李欣睿、复旦大学星云 EGA 的 [云台滑模开源](https://github.com/xinruilee04/smc_controller) 与 [教学文章](https://bbs.robomaster.com/article/1939327?source=1)，按原理重新实现 C 接口，并针对周期、参考信号、数值和电机协议进行优化：
+## 先在电脑上运行
 
-- 显式使用 rad、rad/s、rad/s²、关节 N·m，修正采样差分的量纲问题。
-- 默认线性滑模加可调边界层；可选连续可微的正则化终端项。
-- 小角误差仍保留速度制动和前馈；Pitch 提供有符号正弦/余弦重力模型、参考包络与硬越限故障锁存示例。
-- 独立参考生成器限制目标速度、加速度，避免位置阶跃直接差分。
-- 输出限幅、可选力矩变化率限制及速度低通；故障立即清零并复位动态状态。
-- DM4310/GM6020 分别做物理量换算和 CAN 编码，统一组帧所有权。
-
-完整推导、原实现问题及整定方法见 [控制器设计](docs/CONTROL_DESIGN.md)。本项目不宣称合成仿真证明了实机性能提升。
-
-## 目录
-
-```text
-include/gimbal_smc.h                 单轴控制器与参考生成器 API
-src/gimbal_smc.c                     纯 C 算法
-include/gimbal_motor.h               电机配置、反馈和 CAN 帧接口
-src/gimbal_motor.c                   DM4310 / GM6020 编解码
-include/gimbal_pitch.h               固定平面 Pitch 重力模型 API
-src/gimbal_pitch.c                   有符号保持力矩计算
-examples/gimbal_controller_example.* 两轴可复用的模式与输出接入示例
-examples/gimbal_pitch_example.*      Pitch 独立反馈、重力与参考约束接入
-docs/CONTROL_DESIGN.md               模型、推导、优化与调参
-docs/PITCH_TUNING.md                 Pitch 坐标、力矩预算、上下行程与调参
-docs/PITCH_VALIDATION.md             大区间升降、偏载及重力坐标专项验证
-docs/RM_FRAMEWORK_INTEGRATION.md      官方／社区框架的接口对照与移植边界
-docs/MOTOR_PROTOCOL.md               官方协议依据和模式差异
-docs/STM32_PORT.md                   官方 C 板例程移植步骤
-tests/                              核心、电机、接入回归
-sim/                                调用实际 C 核心的合成仿真与绘图
-sim/open_models/                    两份开源模型原文、许可和派生参数
-tools/derive_open_model_profiles.py  离线复算惯量、重力及核对来源哈希
-cmake/arm-none-eabi.cmake             Cortex-M4F 交叉编译配置示例
-```
-
-## 最小调用
-
-将 `src/gimbal_smc.c` 加入 Keil/IAR/CMake 工程，添加 `include` 路径并链接数学库。初始化一次，每个周期提供同一时间戳的反馈及参考：
-
-```c
-#include "gimbal_smc.h"
-
-static gimbal_smc_t yaw;
-
-bool yaw_init(void)
-{
-    gimbal_smc_config_t c;
-    gimbal_smc_default_config(&c);
-    /* Replace illustrative J/gains/limits with this gimbal's measured values. */
-    c.wrap_angle = true; /* Only for shortest-path yaw, not multi-turn targets. */
-    return gimbal_smc_init(&yaw, &c);
-}
-
-gimbal_smc_output_t yaw_step(float angle, float rate,
-                             gimbal_smc_reference_t ref,
-                             float dt_s, float oldest_feedback_age_s,
-                             bool enabled)
-{
-    gimbal_smc_input_t in = {0};
-    gimbal_smc_output_t out;
-    in.angle_rad = angle;
-    in.rate_rad_s = rate;
-    in.reference_rad = ref.angle_rad;
-    in.reference_rate_rad_s = ref.rate_rad_s;
-    in.reference_accel_rad_s2 = ref.accel_rad_s2;
-    in.dt_s = dt_s;
-    in.feedback_age_s = oldest_feedback_age_s;
-    in.enable = enabled;
-    gimbal_smc_update(&yaw, &in, &out);
-    return out; /* Inspect valid/flags, then map torque_nm to the motor. */
-}
-```
-
-只有目标角度时，使用 `gimbal_reference_step()` 生成三元参考；完整调用与故障恢复见 [接入示例](examples/gimbal_controller_example.c)。初次启用时参考锚定到本拍反馈。是否使能、目标丢失后的行为、机械限位和故障恢复授权由现有云台模式管理器负责。
-
-**返回有效力矩不表示已经完成发送。** CAN 发送者需检查适配返回值与 HAL 状态。DM 示例区分 DISABLED/ARMING/RUNNING/FAULT：ARMING 期间由上层发送 FC 并等待新鲜使能反馈，不用 FD 覆盖正在使能的命令；运行故障生成 FD。GM 停止时只清本轴槽，再由组帧所有者统一发送。
-
-## 电机适配
-
-| 电机 | 本库推荐接法 | 接入前要核对 |
-|---|---|---|
-| DM4310 | MIT，`kp=kd=0`，发送力矩前馈 | 模式、CAN/MASTER ID、PMAX/VMAX/TMAX、输出轴口径、看门狗 |
-| GM6020 | 固件支持且已开启原生电流模式 | 模式、`Kt`、电流限制、ID及统一发送者 |
-
-GM6020 电流组使用 **0x1FE/0x2FE**，旧电压组使用 **0x1FF/0x2FF**。不要把新版电流值交给未修改的官方旧 `CAN_cmd_gimbal()`。旧电压模式仅提供原始报文编码，尚未提供额外 MCU 电流内环。协议、固件要求与制造商资料见 [电机说明](docs/MOTOR_PROTOCOL.md)。
-
-## 优先接入官方例程
-
-以 [RoboMaster 官方开发板 C 例程](https://github.com/RoboMaster/Development-Board-C-Examples) 为主要参考：保留其模式管理、INS 与反馈转换，替换相应闭环的计算部分，并改造 CAN 输出接口。
-
-官方 `gimbal_feedback_update()` 已进行陀螺轴转换，应复用更新后的角度/角速度。方向取反只做一次；GM 电流组由一个发送者统一提交。具体修改位置和 HAL 桥接代码见 [STM32 移植说明](docs/STM32_PORT.md)。本库不打包或改写官方整车工程。
-
-另对照了 HNUYueLuRM 与 rm-controls 的目标、反馈、前馈和电机输出分层，见 [框架接口对照](docs/RM_FRAMEWORK_INTEGRATION.md)。借鉴的是接口职责与坐标处理；不同工程的陀螺轴、原生输出模式及单位仍须沿具体源码核对。
-
-## 构建与测试
+需要 C99 编译器、CMake 3.16+；安装 Python 3.9+ 可运行完整的 9 个 CTest 测试入口。
 
 ```sh
+git clone https://github.com/LYHrmer/robomaster-smc-controller.git
+cd robomaster-smc-controller
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build --parallel
 ctest --test-dir build --output-on-failure
-./build/simulate build/simulation.csv
 ```
 
-可选主机检测：`-DGIMBAL_SANITIZE=ON` 启用 AddressSanitizer/UBSan。若受调试器/ptrace 限制导致 LeakSanitizer 无法运行，可对测试进程设置 `ASAN_OPTIONS=detect_leaks=0`；算法本身不分配动态内存。
+完整环境下应看到 `100% tests passed`，共 9 项。测试包含控制器、电机协议、接入示例和多场景仿真；生成的数据保存在 `build/`。下一步见 [快速开始](docs/QUICKSTART.md)，其中说明如何选择接口、复制源文件和接入反馈。
 
-只构建 MCU 静态库：
+## 控制链路与主要功能
 
-```sh
-cmake -S . -B build-arm \
-  -DCMAKE_TOOLCHAIN_FILE=cmake/arm-none-eabi.cmake \
-  -DGIMBAL_BUILD_TESTS=OFF -DGIMBAL_BUILD_SIM=OFF
-cmake --build build-arm --parallel
+```mermaid
+flowchart LR
+    A["应用层<br/>参考、反馈、模式"] --> B["每轴一份 C SMC<br/>关节力矩 N·m"]
+    B --> C["电机适配<br/>DM4310 / GM6020"]
+    C --> D["原工程<br/>CAN 组帧与发送"]
 ```
 
-需要自行安装 `arm-none-eabi-gcc`。示例配置为 Cortex-M4F hard-float，必须与目标 MCU、工程浮点 ABI 一致；H7/M7 等应调整编译参数。**不要启用 `-ffast-math`**，它可能破坏 `isfinite` 异常检查。终端项使用 `powf`，应在实际 MCU/中断负载下测量最坏执行时间。
+| 模块 | 提供的能力 |
+|---|---|
+| 单轴滑模核心 | 默认线性滑模与可调边界层；可选正则化终端项 |
+| 参考生成 | 位置目标生成角度、速度、加速度；已有解析三元参考可直接输入核心 |
+| 输出与有效性 | 力矩限幅、可选变化率限制、速度低通；检查周期、反馈超时和非有限值 |
+| Pitch 辅助 | 有符号重力模型；独立的控制角、重力角与机械相对角接入示例 |
+| 电机适配 | 按方向、传动与电机参数换算力矩，提供协议编解码及统一组帧接口 |
 
-开源模型验证见 [576 组合报告](docs/OPEN_MODEL_VALIDATION.md)，参数可通过 `python3 tools/derive_open_model_profiles.py --check` 离线复算。`ctest` 同时运行原合成回归、开源模型验证和来源检查；后者需要 Python 3.9+。
+参考生成器限制速度和加速度，**不保证参考无过冲**；Pitch 示例的参考包络也不等于机械停车保证。调参方法与适用条件见 [控制器设计](docs/CONTROL_DESIGN.md) 和 [Pitch 整定](docs/PITCH_TUNING.md)。
 
-更接近 Pitch 调参问题的分方向跟踪、重力高估／低估、附载和静态底座倾角对照见 [Pitch 专项报告](docs/PITCH_VALIDATION.md)。诊断场景的原始 PASS 不代表其坐标选择正确；该报告单列验收与诊断结果。
+## 电机和轴怎么选
 
-原合成算例与假设见 [sim/assumptions.md](sim/assumptions.md)，已执行检查见 [验证记录](docs/VALIDATION.md)。完整轨迹 CSV 可通过测试重新生成，默认不纳入 Git；保留逐组合指标与图件。测试通过仅说明列出的软件回归成立，不代表完成固件时序、总线或机械验证。
+| 对象 | 接入方式 | 关键条件 |
+|---|---|---|
+| DM4310 | MIT 模式，`kp=kd=0`，发送力矩前馈 | 核对模式、ID、协议量程、传动和看门狗 |
+| GM6020 | 已启用的原生电流模式 | 核对电机固件、力矩常数、电流限制和 CAN 分组 |
+| 连续多圈 Yaw | 连续角反馈与目标，`wrap_angle=false` | 保留累计圈数；最短路径角差只用于明确需要该语义的场景 |
+| 有限行程 Pitch | 独立参数、重力前馈及机械角约束 | 明确重力相位、零位和上下行程，分别检查加速与制动余量 |
+| 三轴 / 折叠双 Pitch | 单轴核心可复用，协调层待实现 | 当前没有三轴目标分配、折叠状态机或三轴联动验证 |
 
-![合成闭环对照：误差与指令力矩](sim/results/closed_loop_comparison.png)
+**GM6020 原生电流组为 `0x1FE/0x2FE`，旧电压组为 `0x1FF/0x2FF`。** 不能把电流命令直接交给未修改的官方旧 `CAN_cmd_gimbal()`；旧电压模式目前仅提供原始报文编码。详见 [电机说明](docs/MOTOR_PROTOCOL.md)。
 
-开源参数验证的代表图与逐组合结果位于 [sim/results/open_models](sim/results/open_models) 和 [open_model_metrics.csv](sim/results/open_model_metrics.csv)。
+接入时统一使用 **rad、rad/s、rad/s²、关节 N·m**；角速度必须是所用控制角在同一坐标系下的导数。保留有限数值检查，编译时不要启用 `-ffast-math`。每个电机只由一个有效控制路径输出，同组 CAN 帧由一个发送者合并。
 
-## 公开复用
+## 已验证到哪一步
 
-本仓库新编写的代码与说明采用 [MIT](LICENSE)。`sim/open_models/sources/` 中归档的第三方模型文件保留其 BSD-3-Clause/Apache-2.0 许可及原始声明；外部文章及手册的许可不因引用发生变化。来源说明见 [参考与致谢](docs/REFERENCES.md)。
+| 验证层级 | 当前结果 | 查看依据 |
+|---|---|---|
+| 主机回归 | Debug、Release、ASan/UBSan 各通过 9 个 CTest 入口 | [验证记录](docs/VALIDATION.md) |
+| 开源模型闭环 | 两份模型派生参数，576 个组合通过 | [模型来源与结果](docs/OPEN_MODEL_VALIDATION.md) |
+| Pitch 专项 | 20 个验收场景通过；另保留 4 个错误坐标诊断 | [大行程、偏载与重力坐标](docs/PITCH_VALIDATION.md) |
+| STM32 工具链 | Cortex-M4F hard-float 四个静态库交叉编译通过 | [构建与边界](docs/VALIDATION.md) |
 
-提交问题时请给出电机型号/固件/模式、MCU、控制周期、轴与单位约定、参数及一段带时间戳的日志。建议至少记录目标/实际角度、目标/实际速度、滑模面、未限幅/限幅后力矩、实际发送值、反馈年龄、周期和故障标志。
+这些结果属于软件与模型验证。**本公共库尚无实机精度、整车固件或 MCU 最坏执行时间验证。** 仿真参数需要按自己的机构标定；4 个诊断场景不计入 Pitch 验收，也不能作为错误重力坐标可用的证明。
+
+下面是 Pitch 专项的分方向误差，完整条件、门槛和原始数据见 [报告](docs/PITCH_VALIDATION.md)。
+
+![Pitch 合成模型的上行、下行与保持误差；不是实机精度](sim/results/pitch/pitch_directional_summary.png)
+
+## 源码入口
+
+| 文件 / 目录 | 内容 |
+|---|---|
+| [gimbal_smc.h](include/gimbal_smc.h) / [gimbal_smc.c](src/gimbal_smc.c) | 单轴控制器与参考生成器 |
+| [gimbal_motor.h](include/gimbal_motor.h) / [gimbal_motor.c](src/gimbal_motor.c) | DM4310 / GM6020 物理量换算与协议 |
+| [gimbal_pitch.h](include/gimbal_pitch.h) / [gimbal_pitch.c](src/gimbal_pitch.c) | 固定平面 Pitch 重力辅助函数 |
+| [examples/](examples/) | 通用轴和 Pitch 接入示例 |
+| [tests/](tests/) / [sim/](sim/) | 回归测试、实际调用 C 核心的仿真与数据 |
+| [docs/](docs/README.md) | 入门、原理、移植、整定、验证及参考资料 |
+
+## 来源、许可与反馈
+
+参考复旦大学星云 EGA 的 [滑模开源项目](https://github.com/xinruilee04/smc_controller)与[教学文章](https://bbs.robomaster.com/article/1939327?source=1)，按原理独立实现 C 接口。设计与框架对照见 [控制器设计](docs/CONTROL_DESIGN.md)、[RM 框架接口对照](docs/RM_FRAMEWORK_INTEGRATION.md)和[参考与致谢](docs/REFERENCES.md)。
+
+本仓库新编写的代码与说明采用 [MIT](LICENSE)；归档的第三方模型保留其 BSD-3-Clause / Apache-2.0 许可及原始声明。
+
+反馈问题时，请附电机型号/固件/模式、MCU、控制周期、轴与单位约定、参数，以及带时间戳的目标/反馈角度、速度、输出力矩和故障标志。可在 [Issues](https://github.com/LYHrmer/robomaster-smc-controller/issues) 提交。

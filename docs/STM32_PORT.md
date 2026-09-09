@@ -1,5 +1,9 @@
 # 接入 RoboMaster 官方 C 型开发板例程
 
+[文档导航](README.md) · [项目首页](../README.md)
+
+初次接触本库，可先按 [快速开始](QUICKSTART.md) 完成主机运行、接口选择和源文件配置，再回到本页修改固件接入点。
+
 优先参考官方 [19.gimbal_task](https://github.com/RoboMaster/Development-Board-C-Examples/blob/master/19.gimbal_task/application/gimbal_task.c) 和 [20.standard_robot](https://github.com/RoboMaster/Development-Board-C-Examples/blob/master/20.standard_robot/application/gimbal_task.h)。保留官方的模式选择、遥控/自瞄输入、INS 与机械相对角处理，在选定的闭环模式中替换控制计算和电机输出路径。
 
 本页提供修改位置和桥接代码；未针对某一块实际板卡生成完整 Keil 工程，也未完成固件链接、烧录及 CAN 台架验证。不同版本的官方例程需按实际字段核对。
@@ -8,7 +12,7 @@
 
 将 `src/gimbal_smc.c`、`src/gimbal_motor.c` 及需要时的 `examples/gimbal_controller_example.c` 加入工程，添加 `include/`、`examples/` 头文件路径。采用 Pitch 专用接入时再加入 `src/gimbal_pitch.c` 和 `examples/gimbal_pitch_example.c`。Keil/IAR 开启对应的 C99 支持；GCC 链接 `libm`。
 
-每轴一个静态 `gimbal_example_axis_t`，Yaw、Pitch 分开提供控制器与参考生成器配置。上电只初始化对象，不在初始化算法时自动发送电机使能。默认参数是示例，需替换机构惯量、力矩上限和参考限制。
+通用位置目标接入每轴使用一个静态 `gimbal_example_axis_t`；Pitch 专用接入使用 `gimbal_pitch_example_t`，直接调用核心则使用 `gimbal_smc_t`。Yaw、Pitch 分开提供各自配置。上电只初始化对象，不在初始化算法时自动发送电机使能。默认参数是示例，需替换机构惯量、力矩上限和参考限制。
 
 STM32F4 的 Cortex-M4F 浮点选项必须与整个固件一致；库和固件不能混用 hard-float/soft-float ABI。M7/H7 按实际芯片调整。禁止 `-ffast-math`，保留 NaN/Inf 检查。
 
