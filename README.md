@@ -19,6 +19,7 @@ Yaw、Pitch 分别使用独立实例与参数。优先提供 [RoboMaster 官方 
 | 先在电脑上运行，再了解接口 | [快速开始](docs/QUICKSTART.md) |
 | 接到官方 C 板 / 自己的 STM32 工程 | [移植步骤](docs/STM32_PORT.md) → [电机协议与模式](docs/MOTOR_PROTOCOL.md) |
 | 调整 Pitch 重力补偿、上下行程和参考限制 | [Pitch 接入与整定](docs/PITCH_TUNING.md) |
+| 从日志辨识惯量、摩擦与重力参数 | [离线辨识与整定流程](docs/IDENTIFICATION.md)（可选电脑端工具） |
 | 理解公式、参数含义与改进 | [控制器设计](docs/CONTROL_DESIGN.md) |
 | 查看仿真依据、结果及当前局限 | [验证记录](docs/VALIDATION.md) |
 | 了解大小 Yaw / 折叠双 Pitch 如何扩展 | [多轴扩展方向](docs/MULTI_AXIS.md)（规划阶段） |
@@ -52,6 +53,7 @@ flowchart LR
 | 参考生成 | 位置目标生成角度、速度、加速度；已有解析三元参考可直接输入核心 |
 | 输出与有效性 | 力矩限幅、可选变化率限制、速度低通；检查周期、反馈超时和非有限值 |
 | Pitch 辅助 | 有符号重力模型；独立的控制角、重力角与机械相对角接入示例 |
+| 离线参数辨识 | 固定构形的积分回归、独立数据验证、float32 候选参数导出 |
 | 电机适配 | 按方向、传动与电机参数换算力矩，提供协议编解码及统一组帧接口 |
 
 参考生成器限制速度和加速度，**不保证参考无过冲**；Pitch 示例的参考包络也不等于机械停车保证。调参方法与适用条件见 [控制器设计](docs/CONTROL_DESIGN.md) 和 [Pitch 整定](docs/PITCH_TUNING.md)。
@@ -77,6 +79,7 @@ flowchart LR
 | 主机回归 | Debug、Release、ASan/UBSan 各通过 9 个 CTest 入口 | [验证记录](docs/VALIDATION.md) |
 | 开源模型闭环 | 两份模型派生参数，576 个组合通过 | [模型来源与结果](docs/OPEN_MODEL_VALIDATION.md) |
 | Pitch 专项 | 20 个验收场景通过；另保留 4 个错误坐标诊断 | [大行程、偏载与重力坐标](docs/PITCH_VALIDATION.md) |
+| 辨识工具与接入 | 合成参数恢复、异常/不可辨识边界检查；8 个候选 C 闭环案例 | [辨识范围与复现](docs/IDENTIFICATION.md) |
 | STM32 工具链 | Cortex-M4F hard-float 四个静态库交叉编译通过 | [构建与边界](docs/VALIDATION.md) |
 
 这些结果属于软件与模型验证。**本公共库尚无实机精度、整车固件或 MCU 最坏执行时间验证。** 仿真参数需要按自己的机构标定；4 个诊断场景不计入 Pitch 验收，也不能作为错误重力坐标可用的证明。

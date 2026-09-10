@@ -9,6 +9,7 @@ option(GIMBAL_BUILD_TESTS "Build host regression tests" ON)
 option(GIMBAL_BUILD_EXAMPLES "Build platform-independent examples" ON)
 option(GIMBAL_BUILD_SIM "Build synthetic host simulation" ON)
 option(GIMBAL_SANITIZE "Enable host address and undefined behavior sanitizers" OFF)
+option(GIMBAL_BUILD_IDENTIFICATION "Enable optional host Python/NumPy identification tests" OFF)
 
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
@@ -78,6 +79,24 @@ if(GIMBAL_BUILD_SIM)
         ${CMAKE_CURRENT_SOURCE_DIR}/tools/derive_open_model_profiles.py --check)
     endif()
   endif()
+endif()
+
+# Offline identification remains optional; the MCU libraries do not use Python.
+if(GIMBAL_BUILD_IDENTIFICATION)
+  if(CMAKE_CROSSCOMPILING OR NOT GIMBAL_BUILD_TESTS)
+    message(FATAL_ERROR "Identification checks require a native host build with GIMBAL_BUILD_TESTS=ON")
+  endif()
+  find_package(Python3 3.9 COMPONENTS Interpreter REQUIRED)
+  execute_process(COMMAND ${Python3_EXECUTABLE} -c "import numpy"
+    RESULT_VARIABLE GIMBAL_NUMPY_STATUS OUTPUT_QUIET ERROR_QUIET)
+  if(NOT GIMBAL_NUMPY_STATUS EQUAL 0)
+    message(FATAL_ERROR "Install requirements-identification.txt into the selected Python3 interpreter")
+  endif()
+  add_test(NAME identification_checks COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_identification.py)
+  add_test(NAME identified_model_closed_loop COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tools/validate_identification.py
+    --output-dir ${CMAKE_CURRENT_BINARY_DIR}/identification --cc ${CMAKE_C_COMPILER})
 endif()
 
 # Assertions are the test oracle, including in Release builds.

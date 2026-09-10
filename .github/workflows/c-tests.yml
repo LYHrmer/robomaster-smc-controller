@@ -8,3 +8,11 @@ jobs:
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DGIMBAL_SANITIZE=ON
       - run: cmake --build build --parallel
       - run: ctest --test-dir build --output-on-failure
+  identification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install -r requirements-identification.txt
+      - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DGIMBAL_BUILD_IDENTIFICATION=ON
+      - run: cmake --build build --parallel
+      - run: ctest --test-dir build --output-on-failure

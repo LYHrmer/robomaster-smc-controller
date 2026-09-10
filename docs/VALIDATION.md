@@ -1,6 +1,6 @@
 # 验证记录
 
-更新日期：2026-09-09。主机环境：Linux、GCC 11.4.0、C99；交叉工具链：GNU Arm Embedded 10.3-2021.10（GCC 10.3.1）。以下区分主机执行、Arm 静态库编译与尚未进行的硬件测量。
+更新日期：2026-09-10。主机环境：Linux、GCC 11.4.0、C99；交叉工具链：GNU Arm Embedded 10.3-2021.10（GCC 10.3.1）。以下区分主机执行、Arm 静态库编译与尚未进行的硬件测量。
 
 ## 已执行
 
@@ -9,6 +9,7 @@
 | Debug，`-Wall -Wextra -Wpedantic -Werror` | 编译通过，9/9 CTest 通过 |
 | Release，同样的警告检查 | 编译通过，9/9 CTest 通过；测试目标显式保留断言 |
 | Debug + AddressSanitizer/UBSan | 编译通过，9/9 CTest 通过 |
+| 可选离线辨识，Release | 11/11 CTest 通过；新增入口内含21项Python检查及8个候选C闭环案例 |
 | Cortex-M4F hard-float 交叉编译 | `gimbal_smc`、`gimbal_motor`、`gimbal_pitch`、`gimbal_example` 四个静态库通过；对象属性确认 Thumb-2／VFPv4／VFP 参数 ABI |
 | 控制核心接口单测 | 方向、过零制动、前馈、角度回绕、限幅/斜率/滤波、超时、NaN/Inf、错误周期及恢复通过 |
 | 正则化终端项 | 导数与独立 double 中心差分对照通过 |
@@ -23,7 +24,9 @@
 | 开源验证器负路径 | 10 类无效输入拒绝；超能力、失稳合成样例分别返回不可行/失败，未运行指标为 NaN |
 | 图件 | 保留原合成及开源模型图；新增 pitch 方向误差和重力坐标对照两组 PNG/SVG/PDF，实际打开检查排版 |
 
-当前 9 个 CTest 名称为 `smc`、`motor`、`example`、`pitch`、`simulation`、`open_model_validation`、`pitch_validation`、`pitch_validator_negative`、`open_model_provenance`。最后一项依赖 Python 3.9+；本轮测试环境已安装 Python。
+默认 9 个 CTest 名称为 `smc`、`motor`、`example`、`pitch`、`simulation`、`open_model_validation`、`pitch_validation`、`pitch_validator_negative`、`open_model_provenance`。最后一项依赖 Python 3.9+；本轮测试环境已安装 Python。
+
+2026-09-10新增可选`identification_checks`与`identified_model_closed_loop`，需`GIMBAL_BUILD_IDENTIFICATION=ON`和NumPy。21项检查覆盖合成参数恢复、坏数据/激励不足、float32导出、多轴头文件，以及力矩比例/重力零偏无法由残差识别的反例。8个候选闭环案例按两轴×两电机×两种负载条件展开，另有8个手定粗模型对照；实际C核心和电机组包后由独立字节解码驱动合成对象。脚本中的C程序按`-O2`独立编译，未继承ASan配置；该新增结果仅按Release主机验证报告。[辨识方法与复现](IDENTIFICATION.md)、[闭环记录](../sim/results/identification/summary.json)。
 
 Arm 编译发现 DM 示例的枚举有符号性差异：原范围判断与零比较在该 ABI 下触发 `-Werror=type-limits`。已改为单次无符号范围检查，保留负枚举及超过上界的拒绝行为；补充非法枚举回归，Debug／Release／ASan+UBSan 的受影响接入测试复验通过。
 

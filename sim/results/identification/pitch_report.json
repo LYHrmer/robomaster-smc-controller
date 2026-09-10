@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "status": "candidate_only",
+  "axis": "pitch",
+  "configuration": "synthetic_fixed_plane_v1",
+  "data_kind": "synthetic",
+  "symbol_prefix": "smc_ident",
+  "model": "tau = J*qdd + B*qd + Fc*tanh(qd/epsilon) + A*sin(qg) + C*cos(qg)",
+  "parameters": {
+    "inertia_kg_m2": 0.01199985746294301,
+    "viscous_nm_s_rad": 0.01099991512366238,
+    "coulomb_nm": 0.025000015420800825,
+    "gravity_sin_nm": 0.05499982878142945,
+    "gravity_cos_nm": 0.1900000210942222,
+    "friction_velocity_rad_s": 0.075
+  },
+  "parameter_units": {
+    "inertia_kg_m2": "kg*m^2",
+    "viscous_nm_s_rad": "N*m*s/rad",
+    "coulomb_nm": "N*m",
+    "friction_velocity_rad_s": "rad/s",
+    "gravity_sin_nm": "N*m",
+    "gravity_cos_nm": "N*m"
+  },
+  "provenance": {
+    "train_sha256": "67ca5828188c16381186b276d2a952c345d3622100b88ae61bfaf63b8299e465",
+    "validation_sha256": "5b843337949ad514a5d1a528e72aa117ba857c33057e3829b393ce8edea8b30c",
+    "metadata_sha256": "f49db974d7026fec00f85adc40d30b4877a7d144b5711035cc78bf1770e809bf",
+    "tool_sha256": "f828bd016b1ee235bddc232b7e00d477c63b4b4a8c2578ebfc5b6a07d20e2e91"
+  },
+  "metadata": {
+    "schema_version": 1,
+    "axis": "pitch",
+    "configuration": "synthetic_fixed_plane_v1",
+    "data_kind": "synthetic",
+    "torque_source": "synthetic_truth",
+    "torque_time_aligned": true,
+    "base_motion": "fixed",
+    "angle_continuous": true,
+    "gravity_frame": "fixed_plane",
+    "friction_velocity_rad_s": 0.075
+  },
+  "settings": {
+    "window_s": 0.05,
+    "max_gap_s": 0.02,
+    "max_condition": 1000000.0,
+    "max_validation_rmse_nm": 0.003
+  },
+  "data": {
+    "train_row_count": 8001,
+    "validation_row_count": 8001
+  },
+  "metrics": {
+    "train": {
+      "window_count": 320,
+      "duration_s": 16.0,
+      "window_duration_min_s": 0.049999999999998934,
+      "window_duration_max_s": 0.05000000000000071,
+      "rank": 5,
+      "condition_number": 3.6467859953301214,
+      "singular_values": [
+        1.3684504177083543,
+        1.2462435170783241,
+        0.9822782458532427,
+        0.6844988502440054,
+        0.3752483473010806
+      ],
+      "column_l2_scales": [
+        27.994690685560244,
+        7.391793885372697,
+        16.511523477999397,
+        5.531665113907336,
+        17.011444429510593
+      ],
+      "discarded_sample_count": 0,
+      "segment_break_count": 0,
+      "gap_break_count": 0,
+      "mean_torque_rmse_nm": 8.557121517295807e-08,
+      "mean_torque_bias_nm": 5.853846097095272e-11,
+      "mean_torque_peak_abs_error_nm": 1.8710582522230013e-07
+    },
+    "validation": {
+      "window_count": 320,
+      "duration_s": 16.0,
+      "window_duration_min_s": 0.049999999999998934,
+      "window_duration_max_s": 0.05000000000000071,
+      "rank": 5,
+      "condition_number": 3.5070352213078593,
+      "singular_values": [
+        1.3604923528720168,
+        1.2207927619228913,
+        1.016139668258015,
+        0.6897059303497418,
+        0.38793233230336815
+      ],
+      "column_l2_scales": [
+        44.932467113632356,
+        9.622935318523094,
+        16.691198574859115,
+        5.3542009619573045,
+        17.06789754077699
+      ],
+      "discarded_sample_count": 0,
+      "segment_break_count": 0,
+      "gap_break_count": 0,
+      "mean_torque_rmse_nm": 2.807690585821275e-07,
+      "mean_torque_bias_nm": 3.735826670618614e-08,
+      "mean_torque_peak_abs_error_nm": 5.555541070512149e-07
+    }
+  },
+  "export_float32": {
+    "parameters": {
+      "inertia_kg_m2": 0.011999857611954212,
+      "viscous_nm_s_rad": 0.010999915190041065,
+      "coulomb_nm": 0.025000015273690224,
+      "gravity_sin_nm": 0.05499982833862305,
+      "gravity_cos_nm": 0.1900000274181366,
+      "friction_velocity_rad_s": 0.07500000298023224
+    },
+    "metrics": {
+      "train": {
+        "window_count": 320,
+        "duration_s": 16.0,
+        "window_duration_min_s": 0.049999999999998934,
+        "window_duration_max_s": 0.05000000000000071,
+        "rank": 5,
+        "condition_number": 3.6467860199034132,
+        "singular_values": [
+          1.368450418433795,
+          1.2462435170189023,
+          0.9822782458544502,
+          0.6844988501772795,
+          0.3752483449714549
+        ],
+        "column_l2_scales": [
+          27.994690685560244,
+          7.391793885372697,
+          16.51152342341853,
+          5.531665113907336,
+          17.011444429510593
+        ],
+        "discarded_sample_count": 0,
+        "segment_break_count": 0,
+        "gap_break_count": 0,
+        "mean_torque_rmse_nm": 8.577271002103717e-08,
+        "mean_torque_bias_nm": 5.980478190101279e-09,
+        "mean_torque_peak_abs_error_nm": 1.856342170813985e-07
+      },
+      "validation": {
+        "window_count": 320,
+        "duration_s": 16.0,
+        "window_duration_min_s": 0.049999999999998934,
+        "window_duration_max_s": 0.05000000000000071,
+        "rank": 5,
+        "condition_number": 3.5070352397033253,
+        "singular_values": [
+          1.3604923534085298,
+          1.220792761922936,
+          1.0161396682583987,
+          0.6897059303492491,
+          0.3879323304215271
+        ],
+        "column_l2_scales": [
+          44.932467113632356,
+          9.622935318523094,
+          16.69119853538647,
+          5.3542009619573045,
+          17.06789754077699
+        ],
+        "discarded_sample_count": 0,
+        "segment_break_count": 0,
+        "gap_break_count": 0,
+        "mean_torque_rmse_nm": 2.8184349844338334e-07,
+        "mean_torque_bias_nm": 4.342702570698728e-08,
+        "mean_torque_peak_abs_error_nm": 5.620590533828018e-07
+      }
+    },
+    "validation": "Same independent window-mean torque threshold after float32 rounding, rebuilding friction regressors with rounded epsilon. Accumulation remains float64; MCU arithmetic is not emulated."
+  },
+  "assumptions_and_limits": [
+    "Fixed base, fixed configuration, continuous same-frame angle/rate; pitch gravity is fixed-plane.",
+    "Torque must be time-aligned joint-side synthetic truth or calibrated feedback, not a command proxy.",
+    "Metadata declares calibration and provenance; this tool cannot independently verify those declarations.",
+    "Non-overlapping trapezoidal windows discard faults, disabled/saturated spans, gaps and segment boundaries.",
+    "Adjacent windows share endpoint measurements: endpoint noise can correlate their residuals even though integration intervals do not overlap.",
+    "Acceptance measures window-mean torque residuals, not instantaneous residuals or closed-loop tracking.",
+    "Full-rank normalized regression is a finite-record excitation check, not a persistent-excitation proof.",
+    "Integral least squares does not remove errors-in-variables or closed-loop noise bias.",
+    "Different hashes do not prove statistical independence; sessions and validation policy must be independent.",
+    "This V1 does not identify moving-base dynamics, folding transitions, axis coupling, or actuator delays.",
+    "No confidence intervals, stability guarantee, or automatic SMC gain tuning are provided.",
+    "Candidate physical parameters require independent control simulation and staged hardware validation."
+  ]
+}

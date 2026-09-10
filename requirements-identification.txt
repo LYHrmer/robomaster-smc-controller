@@ -1,0 +1,2 @@
+# Optional PC-side tool dependency; never needed by the STM32 C99 library.
+numpy>=1.23.5,<3
