@@ -1,6 +1,6 @@
 # 接入 RoboMaster 官方 C 型开发板例程
 
-[文档导航](README.md) · [项目首页](../README.md)
+[文档导航](README.md) · [工程结构](PROJECT_STRUCTURE.md) · [项目首页](../README.md)
 
 初次接触本库，可先按 [快速开始](QUICKSTART.md) 完成主机运行、接口选择和源文件配置，再回到本页修改固件接入点。
 
@@ -11,6 +11,8 @@
 ## 1. 加入源文件
 
 将 `src/gimbal_smc.c`、`src/gimbal_motor.c` 及需要时的 `examples/gimbal_controller_example.c` 加入工程，添加 `include/`、`examples/` 头文件路径。采用 Pitch 专用接入时再加入 `src/gimbal_pitch.c` 和 `examples/gimbal_pitch_example.c`。Keil/IAR 开启对应的 C99 支持；GCC 链接 `libm`。
+
+需要在线观察模型参数时，再加入 `src/gimbal_rls.c` 与 `src/gimbal_identification.c`。两者均为纯 C99；只有应用调用时才进行辨识，不依赖电脑端 Python 工具。CMake 中的 `GIMBAL_BUILD_IDENTIFICATION` 仅控制可选离线测试，不控制这两个 C 模块；完整库依赖见 [工程结构](PROJECT_STRUCTURE.md)。
 
 通用位置目标接入每轴使用一个静态 `gimbal_example_axis_t`；Pitch 专用接入使用 `gimbal_pitch_example_t`，直接调用核心则使用 `gimbal_smc_t`。Yaw、Pitch 分开提供各自配置。上电只初始化对象，不在初始化算法时自动发送电机使能。默认参数是示例，需替换机构惯量、力矩上限和参考限制。
 
@@ -146,3 +148,20 @@ HAL_OK 表示提交成功，不等于电机已执行。HAL_BUSY、bus-off、发�
 - 进入模式、ARMING 超时、遥控失联、自瞄丢失、机械限位、反馈丢帧和恢复期间的状态与实际发帧记录。
 
 最小移植改动集中在源文件列表、两个控制器实例、闭环分支、模式转换后的参考复位，以及电机分组/发送接口。本文不要求迁移到其他战队整车框架。
+
+## 7. 可选的在线参数观察
+
+每轴、每个固定构形静态分配一个 `gimbal_identification_t`，在初始化时提供模型初值、物理边界和窗口配置。详细接口与示例见 [在线辨识](ONLINE_IDENTIFICATION.md)；电脑端日志验证见 [离线辨识](IDENTIFICATION.md)。原模式、控制计算与 CAN 发送仍各自拥有原来的职责。
+
+| 固件接入点 | 需要提供或处理的内容 |
+|---|---|
+| 新反馈快照发布处 | 连续关节角及其导数、重力相位、已标定且同步的实际关节力矩、采集时间戳与反馈年龄 |
+| 辨识任务 | 按采集顺序消费新快照；用 `operating_conditions_valid` 等字段声明当前固定底座/构形、标定与同步条件成立 |
+| 模式与数据中断处 | 数据断续、坐标重定位时更换 `segment_id` 或清观测；新构形使用对应实例或明确重新初始化 |
+| 记录与参数配置处 | 保存模型、创新指标、构形 ID；独立验证后由应用显式采纳，`ready` 本身不会改变 SMC |
+
+`timestamp_us` 的单位是微秒，不能直接填 DWT 周期数。重复读取缓存不能冒充新样本；后台队列丢样、超时或阶段变化必须反映到数据状态，让转换层断开积分窗口。微秒时间戳支持自然回绕，相邻时间的先后判定要求间隔小于 `2^31` 微秒，约35.8分钟。停止采样超过该区间时，先调用 `gimbal_identification_clear_observations()` 保留参数/P并重设时基；仅更换 `segment_id` 不能消除这种时间歧义。
+
+固定模型不适用时停止积累辨识数据，保留控制器当前配置。尤其不能将正在折叠、底座明显运动或未经标定的电流指令声明为合格的单轴动力学样本。辨识计算与诊断记录也需要在实际中断和任务负载下测量执行时间；现有代码和主机测试不提供 MCU 截止时间保证。
+
+本次 Cortex-M4F 构建中，完整 `gimbal_identification_t` 状态为 1328 B，已包含内部 RLS。`.su` 文件给出的 `gimbal_rls_update()` 自身栈帧为 800 B，转换层 `update()` 自身为 136 B；它们都不是任务总栈需求。分配任务栈时需要保留整个调用链、数学函数、中断嵌套和上下文保存的开销，并在实际固件中检查栈峰值。工具链与测量口径见 [验证记录](VALIDATION.md)。

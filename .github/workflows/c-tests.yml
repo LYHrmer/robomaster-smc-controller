@@ -16,3 +16,24 @@ jobs:
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DGIMBAL_BUILD_IDENTIFICATION=ON
       - run: cmake --build build --parallel
       - run: ctest --test-dir build --output-on-failure
+  arm-static-libraries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Arm C compiler and newlib headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y gcc-arm-none-eabi libnewlib-arm-none-eabi
+          arm-none-eabi-gcc --version
+      - name: Configure Cortex-M4F C99 static libraries
+        run: >-
+          cmake -S . -B build-arm -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_TOOLCHAIN_FILE=cmake/arm-none-eabi.cmake
+          -DGIMBAL_BUILD_TESTS=OFF -DGIMBAL_BUILD_SIM=OFF
+          -DGIMBAL_BUILD_EXAMPLES=ON -DGIMBAL_BUILD_IDENTIFICATION=OFF
+          -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG -fno-fast-math"
+      - name: Build all six Arm libraries
+        run: >-
+          cmake --build build-arm --parallel --target
+          gimbal_smc gimbal_motor gimbal_pitch gimbal_example
+          gimbal_rls gimbal_identification

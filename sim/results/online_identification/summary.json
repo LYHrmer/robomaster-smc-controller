@@ -1,0 +1,93 @@
+{
+  "kind": "synthetic_online_identification_validation",
+  "date": "2026-09-10",
+  "hardware_validation": false,
+  "unbiased_estimator_claim": false,
+  "host_compiler": "GNU C 11.4.0",
+  "build_type": "Release",
+  "command": "cmake -S . -B build-online-release -DCMAKE_BUILD_TYPE=Release && cmake --build build-online-release && ctest --test-dir build-online-release -R online_identification_closed_loop --output-on-failure",
+  "source_sha256": {
+    "sim/validate_online_identification.c": "1bf7b6ccdbfef03ba8f1f3c1b3d9b031c2a98eb03130d9227b24165252999664",
+    "src/gimbal_smc.c": "722cc7c626f4a4fc6bf970c918e7dbb9fcf1206e49ac574279d05c74f3ff4e5b",
+    "src/gimbal_motor.c": "4f58863fa3a145c1fa27c6b10dfc07cf3ed4dcefcace32e782c7ecaefaaffa51",
+    "src/gimbal_rls.c": "ffc14d76c88217fcadfb57858a28725029cf541b0a0a6fc9e62a84580160ae3a",
+    "src/gimbal_identification.c": "c555399c17a3fbb3825795725c5f128d033bbb85ecbd371c6d33a8f943399a03",
+    "include/gimbal_rls.h": "131b09fa78407f6f59b23c4b16f94f326bbbaf34329fe9cf483b3d03ff7922f3",
+    "include/gimbal_identification.h": "e082b1dfeb8095b1ae384375710c97b7af3363fb1e991491359b8f2300a665d1"
+  },
+  "cases": {
+    "online_candidates": 4,
+    "initial_model_controls": 4,
+    "axes": [
+      "yaw",
+      "pitch"
+    ],
+    "motor_protocols": [
+      "GM6020 native current",
+      "DM4310 MIT torque"
+    ]
+  },
+  "assumptions": [
+    "fixed base and configuration",
+    "independent single-axis model",
+    "known friction velocity scale",
+    "synthetic calibrated and synchronized joint torque feedback",
+    "known matching model structure; small deterministic measurement perturbations",
+    "controller gains fixed, candidate application is an explicit simulator decision",
+    "reference frequency switch at 28 s can be discontinuous; its next 2 s are excluded from error metrics"
+  ],
+  "timing": {
+    "control_hz": 1000,
+    "identification_window_s": 0.05,
+    "duration_s": 44,
+    "actuator_delay_samples": 3,
+    "actuator_lag_s": 0.003,
+    "pause_start_s": 12,
+    "pause_end_s": 14,
+    "candidate_capture_start_s": 24,
+    "candidate_capture_deadline_s": 27,
+    "held_out_reference_start_s": 28,
+    "score_start_s": 30,
+    "transition_excluded_from_score_s": [
+      28,
+      30
+    ]
+  },
+  "acceptance": {
+    "max_parameter_relative_error": 0.12,
+    "candidate_rms_rad": 0.02,
+    "candidate_peak_rad": 0.06,
+    "candidate_rms_less_than_initial": true,
+    "pause_bitwise_freeze_checks_per_run": 2000,
+    "yaw_final_angle_above_rad": 12.566370614359172
+  },
+  "observed": {
+    "all_passed": true,
+    "max_parameter_relative_error": 0.002342186191,
+    "candidate_max_rms_rad": 0.0006115585626,
+    "candidate_max_peak_rad": 0.001876538905
+  },
+  "note": "ready_time_s is the first accepted ready event at or after 24 s, not initial convergence time; learning continues after capture. CSV J/B/Fc/A/C are the captured candidate in both initial_model and accepted_candidate rows; parameters selects which model the controller uses. Gate pass is not hardware qualification.",
+  "endurance": {
+    "kind": "generic_five_parameter_numeric_regression_not_a_mechanical_plant",
+    "source": "tests/test_rls_endurance.c",
+    "source_sha256": "067161e8222923302d2a2fcb4b156d78b53ce4835b62c67cd3fcf43b2fd6300b",
+    "command": "ctest --test-dir build-online-release -R rls_endurance -V",
+    "observations": 120000,
+    "accepted_updates": 113171,
+    "scored_observations": 93425,
+    "disabled_calls_with_bitwise_frozen_theta_and_P": 2400,
+    "low_excitation_calls_with_bitwise_frozen_theta_and_P": 4429,
+    "continuous_intervals_including_initial_warmup": 25,
+    "synthetic_dt_s": 0.01,
+    "forgetting_time_s": 2,
+    "score_excludes_first_samples_after_start_or_interruption": 800,
+    "gates": {
+      "each_normalized_rmse_less_than": 0.035,
+      "each_normalized_peak_less_than": 0.07,
+      "each_rmse_less_than_fraction_of_fixed_initial_rmse": 0.5
+    },
+    "pass": true,
+    "note": "Independent double-precision slowly varying truth, finite deterministic noise, independent double SPD check every call. Not MCU execution-time or gimbal performance evidence."
+  }
+}

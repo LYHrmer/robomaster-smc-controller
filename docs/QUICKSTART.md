@@ -15,7 +15,7 @@ ctest --test-dir build --output-on-failure
 ./build/simulate build/simulation.csv
 ```
 
-前三步编译实际 C 核心、适配层和例程，并运行软件回归及模型仿真；最后一步单独生成 `build/simulation.csv`，便于查看轨迹。安装了上述 Python 时应有 **9 项 CTest**，未找到 Python 时不注册来源检查。
+前三步编译实际 C 核心、适配层、在线拟合模块和例程，并运行软件回归及模型仿真；最后一步单独生成 `build/simulation.csv`，便于查看轨迹。默认配置安装了上述 Python 时注册 **13 项 CTest**，未找到 Python 时不注册来源检查。运行后检查各项是否通过，当前执行记录见 [验证记录](VALIDATION.md)。
 
 不需要连接电机。已有图件和结果解释见 [验证记录](VALIDATION.md)、[开源模型验证](OPEN_MODEL_VALIDATION.md) 和 [Pitch 专项验证](PITCH_VALIDATION.md)。主机测试通过后，STM32 执行时间、CAN 负载和实机参数仍需在自己的工程中验证。
 
@@ -44,6 +44,8 @@ Pitch 示例用于同平面、同正方向、控制角与机械角可按偏置�
 
 多轴可以增加独立实例。**折叠双 Pitch、大小 Yaw 的目标分配、构形判断和耦合补偿需要另行实现**；现有 Pitch 示例不是三轴或折叠机构控制器。
 
+这些接口负责控制输出。若要从反馈中获取物理参数，再按本页末尾的 [可选辨识入口](#5-可选获取物理参数) 加入独立模块。
+
 ## 3. 加入自己的 C99 工程
 
 | 需要的功能 | 加入工程的源文件 | 头文件目录 |
@@ -52,8 +54,9 @@ Pitch 示例用于同平面、同正方向、控制角与机械角可按偏置�
 | DM4310 / GM6020 力矩换算、报文编解码 | 另加 `src/gimbal_motor.c` | `include/` |
 | 通用位置目标接入与电机输出示例 | 再加 `examples/gimbal_controller_example.c` | `include/`、`examples/` |
 | 完整 Pitch 接入示例 | 在上述基础上加 `src/gimbal_pitch.c`、`examples/gimbal_pitch_example.c` | `include/`、`examples/` |
+| 在线云台参数拟合（可选） | `src/gimbal_rls.c`、`src/gimbal_identification.c` | `include/` |
 
-仅需重力计算函数时，`gimbal_pitch.c` 也可以独立使用。核心不依赖 HAL、RTOS、C++ 或堆内存；GCC 链接数学库 `libm`，Keil/IAR 开启相应 C99 支持。保留 NaN/Inf 检查，**不要启用 `-ffast-math`**；MCU 与库的浮点 ABI 必须一致。交叉编译入口见 [构建与验证](VALIDATION.md)。
+仅需重力计算函数时，`gimbal_pitch.c` 也可以独立使用；SMC 不依赖在线拟合模块。上述 C 模块不依赖 HAL、RTOS、C++ 或堆内存；GCC 链接数学库 `libm`，Keil/IAR 开启相应 C99 支持。保留 NaN/Inf 检查，**不要启用 `-ffast-math`**；MCU 与库的浮点 ABI 必须一致。模块依赖见 [工程结构](PROJECT_STRUCTURE.md)，交叉编译见 [构建与验证](VALIDATION.md)。
 
 接线前先统一以下约定：
 
@@ -88,3 +91,16 @@ Pitch 示例用于同平面、同正方向、控制角与机械角可按偏置�
 GM 同一组的全部槽位由一个发送者汇总，不能每轴各发一帧并清掉其他轴。旧官方 `CAN_cmd_gimbal()` 也不能原样接收新的电流指令。
 
 具体修改位置、DM 使能过程和 bxCAN HAL 桥接见 [STM32 移植步骤](STM32_PORT.md)；模式、量程和制造商依据见 [电机协议说明](MOTOR_PROTOCOL.md)。需要对照其他 RM 框架时阅读 [框架接口对照](RM_FRAMEWORK_INTEGRATION.md)。
+
+## 5. 可选：获取物理参数
+
+控制器可以直接使用已经标定的配置。需要辨识惯量、摩擦和重力时，有两条独立路径：
+
+| 路径 | 运行位置 | 入口与结果 |
+|---|---|---|
+| 在线拟合 | STM32，纯 C99 | [`gimbal_identification`](ONLINE_IDENTIFICATION.md) 从新采样形成积分窗口，交给 RLS 输出物理参数候选 |
+| 离线辨识 | 电脑，Python/NumPy | [`identify_gimbal.py`](IDENTIFICATION.md) 读取独立训练/验证日志，导出报告和候选 C 常量 |
+
+两条云台辨识路径都要求固定底座、固定构形和同步标定的关节力矩；Yaw 拟合 `J/B/Fc`，Pitch 再拟合重力系数 `A/C`。在线 `ready` 仅表示本拍候选数据门槛满足，**不会自动更新 `gimbal_smc_t` 或调整控制增益**。行驶中、折叠中及三轴耦合不属于当前云台模型范围。
+
+在线 C 模块已包含在常规 CMake 构建中。`GIMBAL_BUILD_IDENTIFICATION=ON` 仅增加电脑端离线检查，完整环境共有 15 个 CTest 入口；依赖安装与运行命令见 [离线辨识说明](IDENTIFICATION.md)，在线采样与候选使用流程见 [在线拟合说明](ONLINE_IDENTIFICATION.md)。

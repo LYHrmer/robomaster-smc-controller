@@ -20,4 +20,6 @@
 
 DM4310 与 GM6020 的制造商手册、厂商源码入口、协议量程和固件要求集中列于 [MOTOR_PROTOCOL.md](MOTOR_PROTOCOL.md)，避免多处维护冲突。
 
+参数辨识的数学与工程参考包括[MIT机械系统辨识讲义](https://underactuated.mit.edu/sysid.html)、[MathWorks递推最小二乘说明](https://www.mathworks.com/help/ident/ref/recursiveleastsquaresestimator.html)，以及[HKUST ENTERPRIZE RM2024功率模块的RLS实现](https://github.com/hkustenterprize/RM2024-PowerModule/blob/23613f8544a44060e91c4fc33b68c9668cfb5f3b/Utils/RLS.hpp)。功率损耗估计与云台动力学的回归模型不同，不能互换参数；本库独立编写C99递推器和积分转换层，没有导入上述实现。具体采用方式见[离线辨识](IDENTIFICATION.md)与[在线拟合](ONLINE_IDENTIFICATION.md)。
+
 感谢原滑模项目作者及复旦大学星云 EGA 战队公开分享设计，感谢官方及社区电控开源工程提供可核对的接口依据。本库采用新的函数、数据结构、保护逻辑及测试，实现独立的 C 控制器接口；外部项目的许可不被本库 MIT 许可覆盖。

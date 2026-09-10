@@ -6,11 +6,13 @@
 [![C99](https://img.shields.io/badge/language-C99-blue)](include/gimbal_smc.h)
 [![Code license MIT](https://img.shields.io/badge/code_license-MIT-green)](LICENSE)
 
-[快速开始](docs/QUICKSTART.md) · [STM32 接入](docs/STM32_PORT.md) · [Pitch 整定](docs/PITCH_TUNING.md) · [全部文档](docs/README.md)
+[快速开始](docs/QUICKSTART.md) · [STM32 接入](docs/STM32_PORT.md) · [Pitch 整定](docs/PITCH_TUNING.md) · [在线拟合](docs/ONLINE_IDENTIFICATION.md) · [全部文档](docs/README.md)
 
 把同一坐标系下的**目标、角度和角速度**交给控制器，得到关节力矩 **N·m**，再由电机适配器转换为 CAN 命令。算法无 HAL、RTOS、堆内存或 C++ 依赖；原工程继续负责模式管理、INS 和 CAN 发送。
 
 Yaw、Pitch 分别使用独立实例与参数。优先提供 [RoboMaster 官方 C 型开发板例程](https://github.com/RoboMaster/Development-Board-C-Examples)的接入方法，适合已有电控框架、希望替换或比较云台闭环的开发者。
+
+需要获取模型参数时，可选用 **STM32 在线 RLS** 或电脑端离线辨识。两者输出惯量、摩擦与重力等物理参数候选，**不会自动改写 SMC 配置或控制增益**。只使用控制器时，无需接入辨识模块。
 
 ## 从这里开始
 
@@ -19,14 +21,16 @@ Yaw、Pitch 分别使用独立实例与参数。优先提供 [RoboMaster 官方 
 | 先在电脑上运行，再了解接口 | [快速开始](docs/QUICKSTART.md) |
 | 接到官方 C 板 / 自己的 STM32 工程 | [移植步骤](docs/STM32_PORT.md) → [电机协议与模式](docs/MOTOR_PROTOCOL.md) |
 | 调整 Pitch 重力补偿、上下行程和参考限制 | [Pitch 接入与整定](docs/PITCH_TUNING.md) |
+| 在 STM32 上随新数据拟合物理参数 | [在线 RLS 与云台积分接口](docs/ONLINE_IDENTIFICATION.md)（可选 C99 模块） |
 | 从日志辨识惯量、摩擦与重力参数 | [离线辨识与整定流程](docs/IDENTIFICATION.md)（可选电脑端工具） |
+| 了解模块依赖、目录和构建选项 | [工程结构](docs/PROJECT_STRUCTURE.md) |
 | 理解公式、参数含义与改进 | [控制器设计](docs/CONTROL_DESIGN.md) |
 | 查看仿真依据、结果及当前局限 | [验证记录](docs/VALIDATION.md) |
 | 了解大小 Yaw / 折叠双 Pitch 如何扩展 | [多轴扩展方向](docs/MULTI_AXIS.md)（规划阶段） |
 
 ## 先在电脑上运行
 
-需要 C99 编译器、CMake 3.16+；安装 Python 3.9+ 可运行完整的 9 个 CTest 测试入口。
+需要 C99 编译器、CMake 3.16+；安装 Python 3.9+ 可运行默认配置的全部 **13 个 CTest 入口**。
 
 ```sh
 git clone https://github.com/LYHrmer/robomaster-smc-controller.git
@@ -36,7 +40,9 @@ cmake --build build --parallel
 ctest --test-dir build --output-on-failure
 ```
 
-完整环境下应看到 `100% tests passed`，共 9 项。测试包含控制器、电机协议、接入示例和多场景仿真；生成的数据保存在 `build/`。下一步见 [快速开始](docs/QUICKSTART.md)，其中说明如何选择接口、复制源文件和接入反馈。
+运行后检查 CTest 是否全部通过。默认测试覆盖控制器、电机、接入示例、在线拟合、长时数值回归和多场景仿真；生成的数据保存在 `build/`。开启可选电脑端辨识检查后共 **15 个入口**，需要 NumPy，见 [构建选项](docs/PROJECT_STRUCTURE.md#构建选项)。
+
+下一步按 [快速开始](docs/QUICKSTART.md) 选择接口、加入源文件和接入反馈。在线拟合本身是 C99 模块，不依赖 Python 或 NumPy。
 
 ## 控制链路与主要功能
 
@@ -53,10 +59,13 @@ flowchart LR
 | 参考生成 | 位置目标生成角度、速度、加速度；已有解析三元参考可直接输入核心 |
 | 输出与有效性 | 力矩限幅、可选变化率限制、速度低通；检查周期、反馈超时和非有限值 |
 | Pitch 辅助 | 有符号重力模型；独立的控制角、重力角与机械相对角接入示例 |
+| 在线参数拟合 | C99 RLS 与积分窗口；检查激励和数据质量，输出固定构形下的物理参数候选 |
 | 离线参数辨识 | 固定构形的积分回归、独立数据验证、float32 候选参数导出 |
 | 电机适配 | 按方向、传动与电机参数换算力矩，提供协议编解码及统一组帧接口 |
 
 参考生成器限制速度和加速度，**不保证参考无过冲**；Pitch 示例的参考包络也不等于机械停车保证。调参方法与适用条件见 [控制器设计](docs/CONTROL_DESIGN.md) 和 [Pitch 整定](docs/PITCH_TUNING.md)。
+
+在线云台辨识要求固定底座、固定构形和同步标定的力矩反馈。`ready` 仅表示本拍满足候选数据门槛；参数仍需独立验证，并由应用显式采纳，见 [在线拟合说明](docs/ONLINE_IDENTIFICATION.md)。
 
 ## 电机和轴怎么选
 
@@ -76,13 +85,15 @@ flowchart LR
 
 | 验证层级 | 当前结果 | 查看依据 |
 |---|---|---|
-| 主机回归 | Debug、Release、ASan/UBSan 各通过 9 个 CTest 入口 | [验证记录](docs/VALIDATION.md) |
+| 主机回归 | Debug、Release 各通过 15 项；ASan/UBSan 默认配置通过 13 项 | [验证记录](docs/VALIDATION.md) |
 | 开源模型闭环 | 两份模型派生参数，576 个组合通过 | [模型来源与结果](docs/OPEN_MODEL_VALIDATION.md) |
 | Pitch 专项 | 20 个验收场景通过；另保留 4 个错误坐标诊断 | [大行程、偏载与重力坐标](docs/PITCH_VALIDATION.md) |
 | 辨识工具与接入 | 合成参数恢复、异常/不可辨识边界检查；8 个候选 C 闭环案例 | [辨识范围与复现](docs/IDENTIFICATION.md) |
-| STM32 工具链 | Cortex-M4F hard-float 四个静态库交叉编译通过 | [构建与边界](docs/VALIDATION.md) |
+| 在线拟合 | 4 个在线候选、4 个初始模型对照均通过合成闭环检查 | [在线范围](docs/ONLINE_IDENTIFICATION.md)与[执行记录](docs/VALIDATION.md) |
+| RLS 长时数值回归 | 12 万次五维慢变观测，包含失能、弱激励冻结、恢复和协方差检查 | [独立测试](tests/test_rls_endurance.c) |
+| STM32 工具链 | GNU Arm 13.2.1 下，Cortex-M4F hard-float 六个静态库交叉编译通过 | [构建与边界](docs/VALIDATION.md) |
 
-这些结果属于软件与模型验证。**本公共库尚无实机精度、整车固件或 MCU 最坏执行时间验证。** 仿真参数需要按自己的机构标定；4 个诊断场景不计入 Pitch 验收，也不能作为错误重力坐标可用的证明。
+这些结果属于软件与模型验证。**本公共库尚无实机精度、整车固件或 MCU 最坏执行时间验证。** 在线案例使用模型结构和摩擦速度尺度已知的合成数据；Pitch 的 4 个错误坐标诊断不计入验收。ASan/UBSan 本机运行时关闭了 LeakSanitizer，完整环境和复现命令见 [验证记录](docs/VALIDATION.md)。
 
 下面是 Pitch 专项的分方向误差，完整条件、门槛和原始数据见 [报告](docs/PITCH_VALIDATION.md)。
 
@@ -90,12 +101,17 @@ flowchart LR
 
 ## 源码入口
 
+完整模块依赖和可选构建关系见 [工程结构](docs/PROJECT_STRUCTURE.md)。
+
 | 文件 / 目录 | 内容 |
 |---|---|
 | [gimbal_smc.h](include/gimbal_smc.h) / [gimbal_smc.c](src/gimbal_smc.c) | 单轴控制器与参考生成器 |
 | [gimbal_motor.h](include/gimbal_motor.h) / [gimbal_motor.c](src/gimbal_motor.c) | DM4310 / GM6020 物理量换算与协议 |
 | [gimbal_pitch.h](include/gimbal_pitch.h) / [gimbal_pitch.c](src/gimbal_pitch.c) | 固定平面 Pitch 重力辅助函数 |
+| [gimbal_rls.h](include/gimbal_rls.h) / [gimbal_rls.c](src/gimbal_rls.c) | 通用在线最小二乘、激励检查与候选状态 |
+| [gimbal_identification.h](include/gimbal_identification.h) / [gimbal_identification.c](src/gimbal_identification.c) | 云台采样到积分回归窗口的转换 |
 | [examples/](examples/) | 通用轴和 Pitch 接入示例 |
+| [tools/identify_gimbal.py](tools/identify_gimbal.py) | 电脑端离线辨识与 C 参数候选导出 |
 | [tests/](tests/) / [sim/](sim/) | 回归测试、实际调用 C 核心的仿真与数据 |
 | [docs/](docs/README.md) | 入门、原理、移植、整定、验证及参考资料 |
 
