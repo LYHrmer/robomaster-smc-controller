@@ -7,30 +7,36 @@
 ## 目录树
 
 ```text
-robomaster-smc-controller/
-├── include/                                公共 C 头文件，与 src/ 中模块同名
+gimbal-smc-controller/
+├── include/                              公共 C 头文件，与 src/ 中模块同名
 ├── src/
-│                                           ├── gimbal_smc.c                 单轴滑模控制与参考生成
-│                                           ├── gimbal_motor.c               关节力矩转换、电机报文与反馈解析
-│                                           ├── gimbal_pitch.c               固定平面重力模型
-│                                           ├── gimbal_rls.c                 通用递推最小二乘
-│                                           └── gimbal_identification.c      云台数据资格检查与积分回归窗口
+│   ├── gimbal_smc.c                      单轴滑模控制与参考生成
+│   ├── gimbal_motor.c                    两种电机的力矩换算、报文与反馈
+│   ├── gimbal_pitch.c                    固定平面重力模型
+│   ├── gimbal_rls.c                      通用递推最小二乘
+│   └── gimbal_identification.c           数据资格检查与积分回归窗口
 ├── examples/
-│                                           ├── gimbal_controller_example.c  通用位置目标接入，配套同名 .h
-│                                           └── gimbal_pitch_example.c       Pitch 接入与参考约束，配套同名 .h
-├── tests/                                  C 回归、耐久测试及离线辨识检查
+│   ├── gimbal_controller_example.c       通用位置目标接入，配套同名 .h
+│   └── gimbal_pitch_example.c            Pitch 接入与参考约束，配套同名 .h
+├── tests/                                C 回归、耐久测试及离线辨识检查
 ├── sim/
-│                                           ├── *.c                         调用实际 C 库的合成验证程序
-│                                           ├── open_models/                固定版本模型、来源与派生参数
-│                                           └── results/                    归档指标、图件和验证条件
+│   ├── *.c                               调用实际 C 库的合成验证程序
+│   ├── open_models/                      固定版本模型、来源与派生参数
+│   └── results/                          归档指标、图件和验证条件
 ├── tools/
-│                                           ├── identify_gimbal.py           电脑端离线辨识与候选参数导出
-│                                           ├── validate_identification.py   离线辨识到 C 闭环的完整演示
-│                                           └── derive_open_model_profiles.py  开源模型参数复算
-├── cmake/arm-none-eabi.cmake               Cortex-M4F 交叉工具链示例
-├── docs/                                   接入、原理、整定和验证文档
-├── .github/workflows/c-tests.yml           主机回归与 Arm 静态库编译
-└── CMakeLists.txt                          库、示例、测试与仿真构建入口
+│   ├── identify_gimbal.py                电脑端离线辨识与候选参数导出
+│   ├── validate_identification.py        离线辨识到 C 闭环的完整演示
+│   └── derive_open_model_profiles.py     开源模型参数复算
+├── cmake/arm-none-eabi.cmake             Cortex-M4F 交叉工具链示例
+├── docs/                                 接入、原理、整定和验证文档
+│   ├── GM6020_IDENTIFICATION.md          GM6020 数据采集与标定
+│   ├── DM4310_IDENTIFICATION.md          DM4310 数据采集与标定
+│   ├── IDENTIFICATION.md                 两种电机共用的离线辨识
+│   ├── ONLINE_IDENTIFICATION.md          两种电机共用的在线拟合
+│   ├── TEST_DATA.md                      测试数据保留清单
+│   └── templates/test_data/              CSV / JSON 采集模板
+├── .github/workflows/c-tests.yml         主机回归与 Arm 静态库编译
+└── CMakeLists.txt                        库、示例、测试与仿真构建入口
 ```
 
 `include/`、`src/` 和需要的 `examples/` 文件可以直接加入 STM32 工程；`tools/` 是电脑端工具。源码路径保持稳定，不要求把整车工程迁入本仓库。
@@ -83,10 +89,13 @@ Arm 交叉编译关闭主机测试和仿真，示例库按需保留，并保持�
 | 计算一拍滑模力矩 | `gimbal_smc_init()`、`gimbal_smc_update()` | [控制律与参数](CONTROL_DESIGN.md) |
 | 使用通用位置目标接入示例 | `gimbal_example_axis_init()`、`gimbal_example_axis_step()` | [通用轴接口](../examples/gimbal_controller_example.h) |
 | 将位置目标变成参考三元组 | `gimbal_reference_init()`、`gimbal_reference_step()` | [gimbal_smc.h](../include/gimbal_smc.h)；速度/加速度受限的参考跟踪器 |
-| 换算力矩、组包或解析反馈 | `gimbal_dm4310_pack_torque()`、`gimbal_gm6020_torque_to_current()` 等 | [电机接口](../include/gimbal_motor.h)与[协议说明](MOTOR_PROTOCOL.md)；发送由原工程负责 |
+| DM4310：MIT 力矩组包与反馈 | `gimbal_dm4310_pack_torque()`、`gimbal_dm4310_decode()` | [DM4310 协议](MOTOR_PROTOCOL.md#dm4310mit-纯力矩)；核对 MIT 量程与反馈状态 |
+| GM6020：电流换算、组帧与反馈 | `gimbal_gm6020_torque_to_current()`、`gimbal_gm6020_pack_current_group()`、`gimbal_gm6020_decode()` | [GM6020 协议](MOTOR_PROTOCOL.md#gm6020明确区分两种模式)；区分原生电流模式与旧电压模式 |
 | 只计算 Pitch 保持力矩 | `gimbal_pitch_gravity_torque()` | [重力模型接口](../include/gimbal_pitch.h) |
 | 接入 Pitch 位置目标示例 | `gimbal_pitch_example_init()`、`gimbal_pitch_example_step()` | [示例接口](../examples/gimbal_pitch_example.h)；真实行程保护仍由应用监督 |
 | 从逐次云台反馈得到模型候选 | `gimbal_identification_init()`、`gimbal_identification_update()` | [在线辨识](ONLINE_IDENTIFICATION.md) |
 | 使用自己的线性参数化模型 | `gimbal_rls_init()`、`gimbal_rls_update()` | [通用 RLS 接口](../include/gimbal_rls.h)；应用提供回归特征 |
 
 各头文件给出了单位、生命周期和返回状态约定；调用方应按这些约定处理无效反馈、模式变化和参数采纳。
+
+两种电机的接口均在 [gimbal_motor.h](../include/gimbal_motor.h) 声明，由同一个 [gimbal_motor.c](../src/gimbal_motor.c) 实现；CAN 发送仍由原工程负责。

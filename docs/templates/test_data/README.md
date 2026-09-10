@@ -4,14 +4,16 @@
 
 这些 CSV 仅有表头，是拟定的保存格式。旧固件不会自动输出这些表，也不是离线辨识工具的九列输入。没有采集的字段留在原始记录中标注缺失，不用零伪装为测量值；生成辨识输入时另按工具规则处理无效行和断窗。
 
-| 文件 | 谁提供数据 |
-|---|---|
-| [usb_existing.template.csv](usb_existing.template.csv) | 现有 USB 包加 PC 接收时间、PC 包序号、CRC 检查；无需改 MCU 包格式 |
-| [mcu_control_existing.template.csv](mcu_control_existing.template.csv) | 旧 MCU 已有目标、姿态、陀螺、输出、状态；需新增快照与导出 |
-| [can_rx_raw.template.csv](can_rx_raw.template.csv) | GM6020 / DM4310 通用原帧；需新增 CAN 接收记录点 |
-| [motor_rx.template.csv](motor_rx.template.csv) | 双 GM6020 原帧及解析值；需新增记录点，不适用于 DM4310 解码字段 |
-| [can_tx.template.csv](can_tx.template.csv) | GM6020 四槽命令的实际软件提交值；需在发送分支新增记录点 |
-| [run.template.json](run.template.json) | 人工填写的实验、配置、采集能力说明；不是工具 `--metadata` 文件 |
+先按 [GM6020（6020）](../../GM6020_IDENTIFICATION.md) 或 [DM4310（4310）](../../DM4310_IDENTIFICATION.md) 指南确定需要记录的反馈，再选择下表中的模板。
+
+| 文件 | 适用范围 | 谁提供数据 |
+|---|---|---|
+| [motor_rx.template.csv](motor_rx.template.csv) | **GM6020 反馈** | 原帧及电流、转速等解析值；需新增记录点，不适用于 DM4310 解码字段 |
+| [can_tx.template.csv](can_tx.template.csv) | **GM6020 命令** | 四槽命令的实际软件提交值；需在发送分支新增记录点 |
+| [can_rx_raw.template.csv](can_rx_raw.template.csv) | **两种电机通用原帧** | 总线、ID、DLC、原始字节；需新增接收记录点，解码方式按型号选择 |
+| [usb_existing.template.csv](usb_existing.template.csv) | 已核对的双 GM6020 旧工程 | 现有 USB 包加 PC 接收时间、PC 包序号、CRC 检查；无需改 MCU 包格式 |
+| [mcu_control_existing.template.csv](mcu_control_existing.template.csv) | 已核对的双 GM6020 旧工程 | 旧 MCU 已有目标、姿态、陀螺、输出、状态；需新增快照与导出 |
+| [run.template.json](run.template.json) | GM6020 起始配置；DM4310 需替换 | 人工填写的实验、配置、采集能力说明；不是工具 `--metadata` 文件 |
 
 `run.template.json` 的电机配置以已核对的双 GM6020 旧工程为起点。使用 DM4310 时，替换 `motors` 中的型号、ID、模式及反馈单位，去掉 GM 四槽/电流计数字段，并按 [4310 说明](../../DM4310_IDENTIFICATION.md#2-用实际电机配置建立-mit-力矩通路)补充实际量程和驱动参数；不要保留不适用的默认值。
 
