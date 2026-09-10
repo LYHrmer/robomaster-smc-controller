@@ -1,67 +1,92 @@
-# 工程结构与构建选择
+# 工程结构与模块选择
 
-[项目首页](../README.md) · [文档导航](README.md)
+[项目首页](../README.md) · [文档导航](README.md) · [快速开始](QUICKSTART.md)
 
-工程按“控制、物理量适配、参数获取、验证”分工。现有源码路径保持稳定，按需要加入模块即可。
+本页用于确定“该加哪些文件、模块依赖什么、接口在哪里”。首次构建命令见[快速开始](QUICKSTART.md)，修改已有固件的接入点见[STM32移植](STM32_PORT.md)。
 
-```mermaid
-flowchart LR
-    A["手瞄 / 自瞄参考与反馈"] --> B["gimbal_smc<br/>每轴 C99 控制器"]
-    B --> C["gimbal_motor<br/>DM4310 / GM6020"]
-    C --> D["原工程 CAN 发送"]
-    F["标定且同步的反馈"] --> E["gimbal_identification<br/>积分窗口 + gimbal_rls"]
-    F --> G["电脑端离线辨识工具"]
-    E --> H["候选模型<br/>独立验证与显式采纳"]
-    G --> H
-    H -. 配置切换 .-> B
+## 目录树
+
+```text
+robomaster-smc-controller/
+├── include/                                公共 C 头文件，与 src/ 中模块同名
+├── src/
+│                                           ├── gimbal_smc.c                 单轴滑模控制与参考生成
+│                                           ├── gimbal_motor.c               关节力矩转换、电机报文与反馈解析
+│                                           ├── gimbal_pitch.c               固定平面重力模型
+│                                           ├── gimbal_rls.c                 通用递推最小二乘
+│                                           └── gimbal_identification.c      云台数据资格检查与积分回归窗口
+├── examples/
+│                                           ├── gimbal_controller_example.c  通用位置目标接入，配套同名 .h
+│                                           └── gimbal_pitch_example.c       Pitch 接入与参考约束，配套同名 .h
+├── tests/                                  C 回归、耐久测试及离线辨识检查
+├── sim/
+│                                           ├── *.c                         调用实际 C 库的合成验证程序
+│                                           ├── open_models/                固定版本模型、来源与派生参数
+│                                           └── results/                    归档指标、图件和验证条件
+├── tools/
+│                                           ├── identify_gimbal.py           电脑端离线辨识与候选参数导出
+│                                           ├── validate_identification.py   离线辨识到 C 闭环的完整演示
+│                                           └── derive_open_model_profiles.py  开源模型参数复算
+├── cmake/arm-none-eabi.cmake               Cortex-M4F 交叉工具链示例
+├── docs/                                   接入、原理、整定和验证文档
+├── .github/workflows/c-tests.yml           主机回归与 Arm 静态库编译
+└── CMakeLists.txt                          库、示例、测试与仿真构建入口
 ```
 
-## 源码模块
+`include/`、`src/` 和需要的 `examples/` 文件可以直接加入 STM32 工程；`tools/` 是电脑端工具。源码路径保持稳定，不要求把整车工程迁入本仓库。
 
-| CMake目标 | 接口与实现 | 依赖 / 职责 |
+## 按接入目标选择文件
+
+| 接入目标 | 需要加入的源文件 | 头文件路径与说明 |
 |---|---|---|
-| `gimbal_smc` | [头文件](../include/gimbal_smc.h) / [C实现](../src/gimbal_smc.c) | 数学库；单轴滑模与参考生成 |
-| `gimbal_motor` | [头文件](../include/gimbal_motor.h) / [C实现](../src/gimbal_motor.c) | 数学库；力矩转换及协议，不发送CAN |
-| `gimbal_pitch` | [头文件](../include/gimbal_pitch.h) / [C实现](../src/gimbal_pitch.c) | 数学库；固定平面有符号重力 |
-| `gimbal_rls` | [头文件](../include/gimbal_rls.h) / [C实现](../src/gimbal_rls.c) | 数学库；最多5参数的在线回归 |
-| `gimbal_identification` | [头文件](../include/gimbal_identification.h) / [C实现](../src/gimbal_identification.c) | `gimbal_rls`；时间戳、数据有效性与积分转换 |
-| `gimbal_example` | [通用轴](../examples/gimbal_controller_example.c) / [Pitch](../examples/gimbal_pitch_example.c) | 控制、电机和Pitch模块；位置目标接入 |
+| **只接控制器** | [src/gimbal_smc.c](../src/gimbal_smc.c) | 添加 `include/`；输入参考三元组（角度、角速度、角加速度）和反馈，得到关节力矩。采用本库 DM4310/GM6020 适配时，再加 [src/gimbal_motor.c](../src/gimbal_motor.c) |
+| **接 Pitch 示例** | `src/gimbal_smc.c`、`src/gimbal_motor.c`、[src/gimbal_pitch.c](../src/gimbal_pitch.c)<br>[examples/gimbal_controller_example.c](../examples/gimbal_controller_example.c)、[examples/gimbal_pitch_example.c](../examples/gimbal_pitch_example.c) | 添加 `include/`、`examples/`；这是位置目标路径，组合参考生成、重力前馈与当前参考区间约束。接法见 [Pitch 整定](PITCH_TUNING.md) |
+| **加在线辨识** | 在所选控制路径之外，加入 [src/gimbal_rls.c](../src/gimbal_rls.c)、[src/gimbal_identification.c](../src/gimbal_identification.c) | 添加 `include/`；辨识器独立读取合格反馈、输出候选模型，不会直接修改控制器。要求和调用流程见 [在线辨识](ONLINE_IDENTIFICATION.md) |
 
-STM32工程可以直接加入所需`.c`及`include/`路径，不要求使用CMake。只接滑模控制时无需增加在线辨识状态。
+通用位置目标接入可在控制器、电机模块上增加 `examples/gimbal_controller_example.c` 和 `examples/` 头文件路径，不必使用 Pitch 专用示例。若已有参考角速度/加速度，或已有合适的电机适配层，可直接使用核心接口。
 
-## 目录与阅读入口
+各轴分别保存自己的控制器或辨识器状态。多轴协调与折叠运动模型属于[后续机构层设计](MULTI_AXIS.md)，不会因增加实例数量自动获得。
 
-| 目录 | 内容 | 入口 |
+## CMake 目标依赖
+
+六个目标均生成静态库，依赖由 [CMakeLists.txt](../CMakeLists.txt) 声明。表中的 `m` 是数学库；直接加入源文件的 GCC 工程也需要链接数学库。
+
+| CMake目标 | 接口与实现 | 直接链接依赖 |
 |---|---|---|
-| `include/`、`src/` | 可移植C99库 | 头文件说明单位、调用约束和返回状态 |
-| `examples/` | 通用轴和Pitch接入 | [STM32移植](STM32_PORT.md) |
-| `tools/` | 电脑端模型来源复算、离线辨识与验证脚本 | [离线辨识](IDENTIFICATION.md) |
-| `tests/` | C回归与可选Python辨识检查 | CMake/CTest |
-| `sim/` | 实际调用C库的合成验证 | [验证总览](VALIDATION.md) |
-| `sim/open_models/` | 固定版本第三方模型、许可与派生参数 | [模型归档说明](../sim/open_models/README.md) |
-| `sim/results/` | 已归档指标和图件 | 各验证报告说明数据口径 |
-| `docs/` | 入门、设计、协议、整定、辨识与验证 | [导航](README.md) |
+| `gimbal_smc` | [头文件](../include/gimbal_smc.h) / [C实现](../src/gimbal_smc.c) | `m` |
+| `gimbal_motor` | [头文件](../include/gimbal_motor.h) / [C实现](../src/gimbal_motor.c) | `m` |
+| `gimbal_pitch` | [头文件](../include/gimbal_pitch.h) / [C实现](../src/gimbal_pitch.c) | `m` |
+| `gimbal_rls` | [头文件](../include/gimbal_rls.h) / [C实现](../src/gimbal_rls.c) | `m` |
+| `gimbal_identification` | [头文件](../include/gimbal_identification.h) / [C实现](../src/gimbal_identification.c) | `gimbal_rls`、`m` |
+| `gimbal_example` | [通用轴](../examples/gimbal_controller_example.c) / [Pitch](../examples/gimbal_pitch_example.c) | `gimbal_smc`、`gimbal_motor`、`gimbal_pitch` |
+
+`gimbal_example` 目标同时包含两个示例源文件，因此会链接 Pitch 模块。在线辨识目标不依赖 `gimbal_smc`；采纳模型参数的流程由应用层连接。
 
 ## 构建选项
 
-| 选项 | 默认 | 用途 |
+| 选项 | 默认 | 控制的内容 |
 |---|---|---|
-| `GIMBAL_BUILD_TESTS` | ON | 主机C回归 |
-| `GIMBAL_BUILD_EXAMPLES` | ON | 编译通用轴/Pitch接入库 |
-| `GIMBAL_BUILD_SIM` | ON | 合成验证程序，包括在线辨识闭环 |
-| `GIMBAL_SANITIZE` | OFF | 主机AddressSanitizer/UBSan |
-| `GIMBAL_BUILD_IDENTIFICATION` | OFF | 额外的电脑端离线辨识检查，需要Python/NumPy |
+| `GIMBAL_BUILD_TESTS` | ON | 主机回归入口；不控制库本体是否构建 |
+| `GIMBAL_BUILD_EXAMPLES` | ON | `gimbal_example` 库及启用测试时的示例回归 |
+| `GIMBAL_BUILD_SIM` | ON | 合成验证程序，以及启用测试时的相应 CTest 入口 |
+| `GIMBAL_SANITIZE` | OFF | GNU/Clang 主机构建的 AddressSanitizer/UBSan |
+| `GIMBAL_BUILD_IDENTIFICATION` | OFF | 额外的电脑端离线辨识检查；要求本机构建、测试开启及 Python 3.9+/NumPy |
 
-在线RLS与云台转换层都是C模块，常规主机构建即包含，无需开启最后一项。最后一项仅控制电脑端工具测试，不能用它开启或关闭电机上的在线拟合。
+**在线 C 模块始终定义为库目标，不受 `GIMBAL_BUILD_IDENTIFICATION` 控制。** 此选项只增加电脑端测试；固件是否进行在线拟合，取决于应用是否创建实例并调用接口。
 
-ARM交叉编译关闭主机测试和仿真；示例库可按需保留。工具链参数必须与整个固件一致，具体命令见[构建验证](VALIDATION.md)。
+Arm 交叉编译关闭主机测试和仿真，示例库按需保留，并保持离线辨识选项关闭。工具链的浮点 ABI 必须与完整固件一致。具体命令、测试数量和已执行结果统一见[验证记录](VALIDATION.md)。
 
-## 推荐接入顺序
+## 按功能查接口
 
-1. [快速开始](QUICKSTART.md)：运行默认主机回归，确定单位与目标接口。
-2. [STM32移植](STM32_PORT.md)与[电机协议](MOTOR_PROTOCOL.md)：接入已有模式、反馈和CAN发送。
-3. [Pitch整定](PITCH_TUNING.md)：确定三个角度、支撑力矩和行程。
-4. [离线辨识](IDENTIFICATION.md)：从标定日志得到物理模型初值。
-5. [在线拟合](ONLINE_IDENTIFICATION.md)：记录参数变化与数据质量，验证后显式应用。
+| 要做的事 | 接口入口 | 进一步说明 |
+|---|---|---|
+| 计算一拍滑模力矩 | `gimbal_smc_init()`、`gimbal_smc_update()` | [控制律与参数](CONTROL_DESIGN.md) |
+| 使用通用位置目标接入示例 | `gimbal_example_axis_init()`、`gimbal_example_axis_step()` | [通用轴接口](../examples/gimbal_controller_example.h) |
+| 将位置目标变成参考三元组 | `gimbal_reference_init()`、`gimbal_reference_step()` | [gimbal_smc.h](../include/gimbal_smc.h)；速度/加速度受限的参考跟踪器 |
+| 换算力矩、组包或解析反馈 | `gimbal_dm4310_pack_torque()`、`gimbal_gm6020_torque_to_current()` 等 | [电机接口](../include/gimbal_motor.h)与[协议说明](MOTOR_PROTOCOL.md)；发送由原工程负责 |
+| 只计算 Pitch 保持力矩 | `gimbal_pitch_gravity_torque()` | [重力模型接口](../include/gimbal_pitch.h) |
+| 接入 Pitch 位置目标示例 | `gimbal_pitch_example_init()`、`gimbal_pitch_example_step()` | [示例接口](../examples/gimbal_pitch_example.h)；真实行程保护仍由应用监督 |
+| 从逐次云台反馈得到模型候选 | `gimbal_identification_init()`、`gimbal_identification_update()` | [在线辨识](ONLINE_IDENTIFICATION.md) |
+| 使用自己的线性参数化模型 | `gimbal_rls_init()`、`gimbal_rls_update()` | [通用 RLS 接口](../include/gimbal_rls.h)；应用提供回归特征 |
 
-折叠双Pitch、大小Yaw的机构协调仍按[多轴扩展规划](MULTI_AXIS.md)推进；每轴可独立保存模型，不代表三轴耦合已经完成。
+各头文件给出了单位、生命周期和返回状态约定；调用方应按这些约定处理无效反馈、模式变化和参数采纳。
