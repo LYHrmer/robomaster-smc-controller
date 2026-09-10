@@ -19,6 +19,7 @@
 | 第一次使用，先运行再选接口 | [快速开始](docs/QUICKSTART.md) |
 | 接入现有云台，包括手瞄和自瞄 | [STM32 移植](docs/STM32_PORT.md) → [电机协议](docs/MOTOR_PROTOCOL.md) |
 | 理解控制参数，处理 Pitch 重力和行程 | [控制器设计](docs/CONTROL_DESIGN.md) → [Pitch 整定](docs/PITCH_TUNING.md) |
+| 准备测试日志，明确哪些数据需要保留 | [测试数据清单与模板](docs/TEST_DATA.md) |
 | 从反馈数据获取模型参数 | [电脑端离线辨识](docs/IDENTIFICATION.md) / [STM32 在线拟合](docs/ONLINE_IDENTIFICATION.md) |
 | 查找模块、验证依据或多轴规划 | [工程结构](docs/PROJECT_STRUCTURE.md) / [验证记录](docs/VALIDATION.md) / [多轴扩展](docs/MULTI_AXIS.md) |
 

@@ -1,0 +1,1 @@
+host_rx_time_s,host_packet_index,crc_ok,reported_mode,usb_yaw_rad,usb_pitch_rad,usb_yaw_vel_rad_s,usb_pitch_vel_rad_s,usb_q0,usb_q1,usb_q2,usb_q3

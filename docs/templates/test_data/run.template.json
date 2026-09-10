@@ -1,0 +1,78 @@
+{
+  "template_kind": "test_capture_run_not_identification_metadata",
+  "template_version": 1,
+  "run_id": null,
+  "experiment": {
+    "axis": null,
+    "purpose": null,
+    "independent_run_number": null,
+    "base_fixed": false,
+    "configuration_id": null,
+    "folded_work_position_notes": null,
+    "load_notes": null,
+    "target_travel_deg": null,
+    "notes_file": "notes.md"
+  },
+  "firmware": {
+    "git_commit": null,
+    "binary_sha256": null,
+    "controller_variant": null,
+    "build_options_file": null,
+    "parameter_snapshot_file": null,
+    "logger_version": null,
+    "decoder_version": null,
+    "online_rls_integrated": false
+  },
+  "motors": [
+    {
+      "axis": "yaw",
+      "model": "GM6020",
+      "bus": "CAN1",
+      "feedback_id": "0x206",
+      "command_id": "0x1FE",
+      "command_slot_one_based": 2,
+      "firmware_version": null,
+      "mode_confirmed": false,
+      "direction": null,
+      "zero_offset_rad": null,
+      "external_gear_ratio": null,
+      "external_efficiency": null,
+      "feedback_current_unit": "raw_count",
+      "current_calibration_file": null,
+      "joint_torque_calibration_file": null
+    },
+    {
+      "axis": "pitch",
+      "model": "GM6020",
+      "bus": "CAN2",
+      "feedback_id": "0x205",
+      "command_id": "0x1FE",
+      "command_slot_one_based": 1,
+      "firmware_version": null,
+      "mode_confirmed": false,
+      "direction": null,
+      "zero_offset_rad": null,
+      "external_gear_ratio": null,
+      "external_efficiency": null,
+      "feedback_current_unit": "raw_count",
+      "current_calibration_file": null,
+      "joint_torque_calibration_file": null
+    }
+  ],
+  "coordinates": {
+    "imu_axes_and_quaternion_convention_file": null,
+    "continuous_yaw_available_in_capture": false,
+    "gravity_phase_calibration_file": null,
+    "fold_joint_sensor_available": false
+  },
+  "capture": {
+    "implemented_streams": [],
+    "record_locations_and_clocks_file": null,
+    "measured_record_rates_hz": null,
+    "feedback_update_timestamps_recorded": false,
+    "log_drop_counter_implemented": false,
+    "can_tx_status_recorded": false,
+    "torque_time_alignment_verified": false,
+    "resets_wraps_gaps_notes_file": null
+  }
+}

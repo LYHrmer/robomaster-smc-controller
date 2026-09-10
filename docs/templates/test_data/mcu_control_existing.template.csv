@@ -1,0 +1,1 @@
+sample_tick_ms,log_seq,yaw_target_deg,pitch_target_deg,yaw_total_deg,pitch_deg,roll_deg,gyro_x_rad_s,gyro_y_rad_s,gyro_z_rad_s,yaw_control_raw,pitch_control_raw,aiming_flag,stop_flag
